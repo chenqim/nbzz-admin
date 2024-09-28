@@ -51,111 +51,115 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '总览', icon: 'dashboard' }
     }]
   },
 
   {
-    path: '/example',
+    path: '/production',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
+    redirect: '/production/workOrder',
+    name: 'Production',
+    meta: { title: '生产管理', icon: 'el-icon-s-tools' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/nested',
-    component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
+        path: 'workOrder',
+        name: 'WorkOrder',
+        component: () => import('@/views/workOrder/index'),
         children: [
           {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
+            path: 'list',
+            name: 'WorkOrderList',
+            component: () => import('@/views/workOrder/list'),
+            meta: { title: '工单管理', icon: 'el-icon-user-solid' }
           }
         ]
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        name: 'Menu2',
-        meta: { title: 'menu2' }
+        path: 'manufacturing',
+        name: 'Manufacturing',
+        component: () => import('@/views/manufacturing/index'),
+        children: [
+          {
+            path: 'list',
+            name: 'ManufacturingList',
+            component: () => import('@/views/manufacturing/list'),
+            meta: { title: '制造执行', icon: 'el-icon-user-solid' }
+          }
+        ]
       }
     ]
   },
 
   {
-    path: 'external-link',
+    path: '/factory',
     component: Layout,
+    redirect: '/factory/product',
+    name: 'Factory',
+    meta: { title: '工厂建模', icon: 'el-icon-s-tools' },
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'product',
+        name: 'Product',
+        component: () => import('@/views/product/index'),
+        children: [
+          {
+            path: 'list',
+            name: 'ProductList',
+            component: () => import('@/views/product/list'),
+            meta: { title: '产品管理', icon: 'el-icon-user-solid' }
+          }
+        ]
+      },
+      {
+        path: 'process',
+        name: 'Process',
+        component: () => import('@/views/process/index'),
+        children: [
+          {
+            path: 'list',
+            name: 'ProcessList',
+            component: () => import('@/views/process/list'),
+            meta: { title: '工序管理', icon: 'el-icon-user-solid' }
+          }
+        ]
+      },
+      {
+        path: 'stage',
+        name: 'Stage',
+        component: () => import('@/views/stage/index'),
+        children: [
+          {
+            path: 'list',
+            name: 'StageList',
+            component: () => import('@/views/stage/list'),
+            meta: { title: '中转区管理', icon: 'el-icon-user-solid' }
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/staff',
+    name: 'System',
+    meta: { title: '系统管理', icon: 'el-icon-s-tools' },
+    children: [
+      {
+        path: 'staff',
+        name: 'Staff',
+        component: () => import('@/views/staff/index'),
+        // meta: { title: '员工管理', icon: 'user' },
+        children: [
+          {
+            path: 'list',
+            name: 'StaffList',
+            component: () => import('@/views/staff/list'),
+            meta: { title: '员工管理', icon: 'el-icon-user-solid' }
+          }
+        ]
       }
     ]
   },
