@@ -60,7 +60,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/production/workOrder',
     name: 'Production',
-    meta: { title: '生产管理', icon: 'el-icon-s-tools' },
+    meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli' },
     children: [
       {
         path: 'workOrder',
@@ -71,7 +71,7 @@ export const constantRoutes = [
             path: 'list',
             name: 'WorkOrderList',
             component: () => import('@/views/workOrder/list'),
-            meta: { title: '工单管理', icon: 'el-icon-user-solid' }
+            meta: { title: '工单管理', icon: 'iconfont icon-gongdan' }
           }
         ]
       },
@@ -84,7 +84,7 @@ export const constantRoutes = [
             path: 'list',
             name: 'ManufacturingList',
             component: () => import('@/views/manufacturing/list'),
-            meta: { title: '制造执行', icon: 'el-icon-user-solid' }
+            meta: { title: '制造执行', icon: 'iconfont icon-zhizaozhixing' }
           }
         ]
       }
@@ -96,7 +96,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/factory/product',
     name: 'Factory',
-    meta: { title: '工厂建模', icon: 'el-icon-s-tools' },
+    meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo' },
     children: [
       {
         path: 'product',
@@ -107,7 +107,7 @@ export const constantRoutes = [
             path: 'list',
             name: 'ProductList',
             component: () => import('@/views/product/list'),
-            meta: { title: '产品管理', icon: 'el-icon-user-solid' }
+            meta: { title: '产品管理', icon: 'iconfont icon-chanpin' }
           }
         ]
       },
@@ -120,7 +120,7 @@ export const constantRoutes = [
             path: 'list',
             name: 'ProcessList',
             component: () => import('@/views/process/list'),
-            meta: { title: '工序管理', icon: 'el-icon-user-solid' }
+            meta: { title: '工序管理', icon: 'iconfont icon-gongxu' }
           }
         ]
       },
@@ -133,7 +133,7 @@ export const constantRoutes = [
             path: 'list',
             name: 'StageList',
             component: () => import('@/views/stage/list'),
-            meta: { title: '中转区管理', icon: 'el-icon-user-solid' }
+            meta: { title: '中转区管理', icon: 'iconfont icon-zhongzhuanqu' }
           }
         ]
       }

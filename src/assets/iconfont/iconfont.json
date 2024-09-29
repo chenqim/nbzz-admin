@@ -1,0 +1,58 @@
+{
+  "id": "4699014",
+  "name": "nbzz-admin",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "管理端",
+  "glyphs": [
+    {
+      "icon_id": "7050563",
+      "name": "数据建模",
+      "font_class": "shujujianmo",
+      "unicode": "e641",
+      "unicode_decimal": 58945
+    },
+    {
+      "icon_id": "39116264",
+      "name": "生产管理",
+      "font_class": "shengchanguanli",
+      "unicode": "e634",
+      "unicode_decimal": 58932
+    },
+    {
+      "icon_id": "1727329",
+      "name": "11中转站-线性",
+      "font_class": "zhongzhuanqu",
+      "unicode": "e88e",
+      "unicode_decimal": 59534
+    },
+    {
+      "icon_id": "4838228",
+      "name": "制造",
+      "font_class": "zhizaozhixing",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "5055854",
+      "name": "产品管理",
+      "font_class": "chanpin",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "7919977",
+      "name": "工序到工序",
+      "font_class": "gongxu",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "27253661",
+      "name": "工单管理",
+      "font_class": "gongdan",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    }
+  ]
+}
