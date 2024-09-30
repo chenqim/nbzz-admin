@@ -73,13 +73,38 @@ service.interceptors.response.use(
   },
   error => {
     console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    console.log('error.response', error.response)
+    // Message({
+    //   message: error.message,
+    //   type: 'error',
+    //   duration: 5 * 1000
+    // })
+    const data = error.response.data
+    const code = data.code
+    const message = data.message
+    handleError(code, message)
     return Promise.reject(error)
   }
 )
+
+const handleError = (code, message) => {
+  switch (code) {
+    case 'A0230':
+    case 'A0221':
+    case 'A0231': // token 已被禁止访问（被挤下线）
+    case 'A0232': // refresh_token 过期
+      break
+
+    default:
+      Message({
+        message,
+        type: 'error',
+        customClass: 'z-index-max',
+        offset: '80',
+        duration: 5 * 1000
+      })
+      break
+  }
+}
 
 export default service

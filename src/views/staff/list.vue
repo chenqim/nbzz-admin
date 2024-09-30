@@ -1,7 +1,8 @@
 <template>
   <div class="app-container">
     <div class="search-panel">
-      <el-form inline :model="queryForm">
+      <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
+      <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="用户名">
           <el-input v-model="queryForm.username" />
         </el-form-item>
@@ -9,14 +10,13 @@
           <el-input v-model="queryForm.name" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="query">查询</el-button>
-          <el-button @click="reset">重置</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="query">查询</el-button>
+          <el-button icon="el-icon-refresh" @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="list-panel">
-      <el-button type="primary">创建</el-button>
-      <el-table v-loading="loading" border :data="tableData" class="mt-4">
+      <el-table v-loading="loading" border :data="tableData">
         <el-table-column label="ID" prop="id" min-width="180" />
         <el-table-column label="用户名" prop="userAccount" min-width="180" />
         <el-table-column label="姓名" prop="userName" min-width="180" />
@@ -50,14 +50,19 @@
         />
       </div>
     </div>
+    <create ref="createRef" @success="getList" />
   </div>
 </template>
 
 <script>
 import { getStaffList } from '@/api/staff'
+import Create from './create'
 
 export default {
   name: 'StaffList',
+  components: {
+    Create
+  },
   data() {
     return {
       queryForm: {
@@ -95,12 +100,51 @@ export default {
       this.getList()
     },
     reset() {
+      this.queryForm = {
+        username: '',
+        name: ''
+      }
       this.pageConfig.page = 1
       this.getList()
     },
-    update() {},
-    del() {},
-    unbindWx() {},
+    create() {
+      this.$refs.createRef.open()
+    },
+    update(row) {
+      this.$refs.createRef.open(row)
+    },
+    async del(row) {
+      try {
+        await this.$confirm('确定删除该员工吗？删除后无法登录系统。', '系统提示', {
+          type: 'warning'
+        })
+        // await deleteStaff({
+        //   ids: [row.id]
+        // })
+        this.$message.success({
+          message: '删除成功',
+          type: 'success'
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async unbindWx() {
+      try {
+        await this.$confirm('确定解绑该员工的微信号吗？解绑后无法登录小程序。', '系统提示', {
+          type: 'warning'
+        })
+        // await deleteStaff({
+        //   ids: [row.id]
+        // })
+        this.$message.success({
+          message: '解绑成功',
+          type: 'success'
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    },
     sizeChange() {},
     pageChange() {}
   }
