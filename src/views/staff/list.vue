@@ -16,7 +16,7 @@
       </el-form>
     </div>
     <div class="list-panel">
-      <el-table v-loading="loading" border :data="tableData">
+      <el-table v-loading="loading" :data="tableData">
         <el-table-column label="ID" prop="id" min-width="180" />
         <el-table-column label="用户名" prop="userAccount" min-width="180" />
         <el-table-column label="姓名" prop="userName" min-width="180" />
@@ -34,8 +34,8 @@
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
         <el-table-column label="操作" width="180" fixed="right">
           <template v-slot="{ row }">
-            <el-button type="text" @click="update(row)">修改</el-button>
-            <el-button type="text" @click="del(row)">删除</el-button>
+            <el-button type="text" :disabled="row.userAccount === 'admin'" @click="update(row)">修改</el-button>
+            <el-button type="text" :disabled="row.userAccount === 'admin'" @click="del(row)">删除</el-button>
             <el-button type="text" @click="unbindWx(row)">解绑微信号</el-button>
           </template>
         </el-table-column>

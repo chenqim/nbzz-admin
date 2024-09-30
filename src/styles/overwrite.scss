@@ -1,0 +1,28 @@
+$table-head-bg-color: #f5f6fa;
+$table-body-bg-color: #fafbfc;
+$active-color: #18a9ee;
+$active-text-color: #ffffff;
+
+.el-table {
+  th {
+    background-color: $table-head-bg-color !important;
+  }
+
+  td {
+    background-color: $table-body-bg-color !important;
+  }
+
+  // 选中样式
+  .current-row {
+    td {
+      background-color: $active-color !important;
+      color: $active-text-color;
+    }
+  }
+}
+
+// 设置el-table 筛选项的高度
+.el-table-filter__list {
+  max-height: 300px;
+  overflow: auto;
+}
