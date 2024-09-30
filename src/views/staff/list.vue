@@ -16,7 +16,7 @@
     </div>
     <div class="list-panel">
       <el-button type="primary">创建</el-button>
-      <el-table v-loading="loading" border :data="tableData" style="margin-top: 16px;">
+      <el-table v-loading="loading" border :data="tableData" class="mt-4">
         <el-table-column label="ID" prop="id" min-width="180" />
         <el-table-column label="用户名" prop="userAccount" min-width="180" />
         <el-table-column label="姓名" prop="userName" min-width="180" />
@@ -40,7 +40,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <div style="text-align: right; margin-top: 16px;">
+      <div class="mt-4 text-right">
         <el-pagination
           background
           :current-page="pageConfig.page"
@@ -107,8 +107,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.w-full {
-  width: 100% !important;
-}
-</style>
+<style lang="scss" scoped></style>

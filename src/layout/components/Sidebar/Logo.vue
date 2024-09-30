@@ -60,6 +60,7 @@ export default {
       height: 32px;
       vertical-align: middle;
       margin-right: 12px;
+      display: inline-block;
     }
 
     & .sidebar-title {
@@ -77,6 +78,7 @@ export default {
   &.collapse {
     .sidebar-logo {
       margin-right: 0px;
+      display: inline-block;
     }
   }
 }
