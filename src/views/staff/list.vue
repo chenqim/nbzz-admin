@@ -22,7 +22,10 @@
         <el-table-column label="姓名" prop="userName" min-width="180" />
         <el-table-column label="角色" min-width="180">
           <template v-slot="{ row }">
-            <span>{{ row.roles || '-' }}</span>
+            <template v-if="row.roleList?.length">
+              <p v-for="(role, index) in row.roleList" :key="index">{{ role.roleName }}({{ role.roleCode }})</p>
+            </template>
+            <template v-else>-</template>
           </template>
         </el-table-column>
         <el-table-column label="绑定微信号" min-width="180">

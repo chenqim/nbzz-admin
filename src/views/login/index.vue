@@ -53,13 +53,13 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+import { validLoginAccount } from '@/utils/validate'
 
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (!validLoginAccount(value)) {
         callback(new Error('Please enter the correct user name'))
       } else {
         callback()

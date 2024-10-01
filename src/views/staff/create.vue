@@ -14,7 +14,7 @@
       </el-form-item>
       <el-form-item label="角色" prop="role">
         <el-select v-model="model.role" class="w-full">
-          <el-option v-for="role in roles" :key="role.roleCode" :value="role.roleCode" :label="role.roleName" />
+          <el-option v-for="role in roles" :key="role.id" :value="role.id" :label="role.roleName" />
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
@@ -86,7 +86,7 @@ export default {
           id: this.ins ? this.ins.id : undefined,
           userAccount: this.model.username,
           userName: this.model.name,
-          role: this.model.role,
+          roleIdList: [this.model.role],
           status: this.model.status
         })
         this.$message({
@@ -107,7 +107,7 @@ export default {
     setDefault() {
       this.model.username = this.ins.userAccount
       this.model.name = this.ins.userName
-      this.model.role = this.ins.role
+      this.model.role = this.ins.roleList.map((item) => item.id)[0]
       this.model.status = this.ins.status ? '1' : '0'
     },
     open(ins) {
