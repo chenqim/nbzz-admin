@@ -19,8 +19,8 @@
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model="model.status">
-          <el-radio label="1">启用</el-radio>
-          <el-radio label="0">禁用</el-radio>
+          <el-radio :label="true">启用</el-radio>
+          <el-radio :label="false">禁用</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -56,7 +56,7 @@ export default {
         username: '',
         name: '',
         role: '',
-        status: '1'
+        status: true
       },
       dialogVisible: false,
       rules: {
@@ -108,7 +108,7 @@ export default {
       this.model.username = this.ins.userAccount
       this.model.name = this.ins.userName
       this.model.role = this.ins.roleList.map((item) => item.id)[0]
-      this.model.status = this.ins.status ? '1' : '0'
+      this.model.status = this.ins.status
     },
     open(ins) {
       this.getRoleList()
