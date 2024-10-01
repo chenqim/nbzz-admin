@@ -88,23 +88,13 @@ service.interceptors.response.use(
 )
 
 const handleError = (code, message) => {
-  switch (code) {
-    case 'A0230':
-    case 'A0221':
-    case 'A0231': // token 已被禁止访问（被挤下线）
-    case 'A0232': // refresh_token 过期
-      break
-
-    default:
-      Message({
-        message,
-        type: 'error',
-        customClass: 'z-index-max',
-        offset: '80',
-        duration: 5 * 1000
-      })
-      break
-  }
+  Message({
+    message,
+    type: 'error',
+    customClass: 'z-index-max',
+    offset: '80',
+    duration: 5 * 1000
+  })
 }
 
 export default service

@@ -7,7 +7,7 @@
   >
     <el-form ref="model" :model="model" :rules="rules" label-width="80px">
       <el-form-item label="用户名" prop="username">
-        <el-input v-model="model.username" />
+        <el-input v-model="model.username" :disabled="!!ins" />
       </el-form-item>
       <el-form-item label="姓名" prop="name">
         <el-input v-model="model.name" />
@@ -16,6 +16,12 @@
         <el-select v-model="model.role" class="w-full">
           <el-option v-for="role in roles" :key="role.roleCode" :value="role.roleCode" :label="role.roleName" />
         </el-select>
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-radio-group v-model="model.status">
+          <el-radio label="1">启用</el-radio>
+          <el-radio label="0">禁用</el-radio>
+        </el-radio-group>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -30,22 +36,34 @@
 <script>
 import { getRoleList } from '@/api/role'
 import { createOrUpdateStaff } from '@/api/staff'
+import { validLoginAccount } from '@/utils/validate'
 
 export default {
   name: 'CreateStaff',
   emits: ['success'],
   data() {
+    const validateUsername = (rule, value, callback) => {
+      if (!validLoginAccount(value)) {
+        callback(new Error('用户名长度 4 到 16 位，只能包含字母、数字、下划线或中划线'))
+      } else {
+        callback()
+      }
+    }
     return {
       loading: false,
       ins: null,
       model: {
         username: '',
         name: '',
-        role: ''
+        role: '',
+        status: '1'
       },
       dialogVisible: false,
       rules: {
-        username: [{ required: true, message: '请输入用户名', trigger: ['blur', 'change'] }],
+        username: [
+          { required: true, message: '请输入用户名', trigger: ['blur', 'change'] },
+          { validator: validateUsername, trigger: ['blur', 'change'] }
+        ],
         name: [{ required: true, message: '请输入姓名', trigger: ['blur', 'change'] }],
         role: [{ required: true, message: '请选择角色', trigger: ['change'] }]
       },
@@ -68,7 +86,8 @@ export default {
           id: this.ins ? this.ins.id : undefined,
           userAccount: this.model.username,
           userName: this.model.name,
-          role: this.model.role
+          role: this.model.role,
+          status: this.model.status
         })
         this.$message({
           type: 'success',
@@ -89,6 +108,7 @@ export default {
       this.model.username = this.ins.userAccount
       this.model.name = this.ins.userName
       this.model.role = this.ins.role
+      this.model.status = this.ins.status ? '1' : '0'
     },
     open(ins) {
       this.getRoleList()

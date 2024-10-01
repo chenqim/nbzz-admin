@@ -30,6 +30,11 @@
             <span>{{ row.wxUserId || '-' }}</span>
           </template>
         </el-table-column>
+        <el-table-column label="状态" min-width="180">
+          <template v-slot="{ row }">
+            <el-tag :type="statusTypeMap[row.status]">{{ statusMap[row.status] }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
         <el-table-column label="操作" width="180" fixed="right">
@@ -55,7 +60,7 @@
 </template>
 
 <script>
-import { getStaffList } from '@/api/staff'
+import { getStaffList, deleteStaff } from '@/api/staff'
 import Create from './create'
 
 export default {
@@ -75,6 +80,14 @@ export default {
         page: 1,
         size: 10,
         total: 0
+      },
+      statusMap: {
+        true: '启用',
+        false: '禁用'
+      },
+      statusTypeMap: {
+        true: 'success',
+        false: 'danger'
       }
     }
   },
@@ -118,13 +131,14 @@ export default {
         await this.$confirm('确定删除该员工吗？删除后无法登录系统。', '系统提示', {
           type: 'warning'
         })
-        // await deleteStaff({
-        //   ids: [row.id]
-        // })
+        await deleteStaff({
+          ids: [row.id]
+        })
         this.$message.success({
           message: '删除成功',
           type: 'success'
         })
+        this.getList()
       } catch (error) {
         console.log(error)
       }
