@@ -7,7 +7,7 @@
   >
     <el-form ref="model" :model="model" :rules="rules" label-width="100px">
       <el-form-item label="中转区编号" prop="code">
-        <el-input v-model="model.code" disabled />
+        <el-input v-model="model.code" />
       </el-form-item>
       <el-form-item label="中转区名称" prop="name">
         <el-input v-model="model.name" />
@@ -17,13 +17,13 @@
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model="model.status">
-          <el-radio :label="true">启用</el-radio>
-          <el-radio :label="false">禁用</el-radio>
+          <el-radio label="enable">启用</el-radio>
+          <el-radio label="disable">禁用</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="备注" prop="remark">
+      <!-- <el-form-item label="备注" prop="remark">
         <el-input v-model="model.remark" type="textarea" :rows="3" resize="none" />
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
     <template #footer>
       <div>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-// import { createOrUpdateStaff } from '@/api/staff'
+import { createStage, updateStage } from '@/api/stage'
 
 export default {
   name: 'CreateProduct',
@@ -48,8 +48,8 @@ export default {
         code: 'STAGE_202410020001',
         name: '',
         position: '',
-        status: true,
-        remark: ''
+        status: 'enable'
+        // remark: ''
       },
       dialogVisible: false,
       rules: {
@@ -63,20 +63,28 @@ export default {
     ok() {
       this.$refs.model.validate((valid) => {
         if (valid) {
-          this.create()
+          if (this.ins) {
+            this.update()
+          } else {
+            this.create()
+          }
         }
       })
+    },
+    handleParams() {
+      return {
+        id: this.ins ? this.ins.id : undefined,
+        code: this.model.code,
+        name: this.model.name,
+        location: this.model.position,
+        status: this.model.status
+        // remark: this.model.remark
+      }
     },
     async create() {
       try {
         this.loading = true
-        // await createOrUpdateStaff({
-        //   id: this.ins ? this.ins.id : undefined,
-        //   userAccount: this.model.username,
-        //   userName: this.model.name,
-        //   roleIdList: [this.model.role],
-        //   status: this.model.status
-        // })
+        await createStage(this.handleParams())
         this.$message({
           type: 'success',
           message: '创建成功'
@@ -87,11 +95,26 @@ export default {
         this.loading = false
       }
     },
+    async update() {
+      try {
+        this.loading = true
+        await updateStage(this.handleParams())
+        this.$message({
+          type: 'success',
+          message: '修改成功'
+        })
+        this.close()
+        this.$emit('success')
+      } catch (error) {
+        this.loading = false
+      }
+    },
     setDefault() {
-      // this.model.username = this.ins.userAccount
-      // this.model.name = this.ins.userName
-      // this.model.role = this.ins.roleList.map((item) => item.id)[0]
-      // this.model.status = this.ins.status
+      this.model.code = this.ins.code
+      this.model.name = this.ins.name
+      this.model.position = this.ins.location
+      this.model.status = this.ins.status
+      // this.model.remark = this.ins.remark
     },
     open(ins) {
       this.ins = ins

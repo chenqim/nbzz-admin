@@ -19,13 +19,13 @@
       <el-table v-loading="loading" :data="tableData">
         <el-table-column label="中转区编号" prop="code" min-width="180" />
         <el-table-column label="中转区名称" prop="name" min-width="180" />
-        <el-table-column label="中转区位置" prop="position" min-width="180" />
+        <el-table-column label="中转区位置" prop="location" min-width="180" />
         <el-table-column label="状态" min-width="180">
           <template v-slot="{ row }">
             <el-tag :type="statusTypeMap[row.status]">{{ statusMap[row.status] }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="备注" prop="remark" min-width="180" />
+        <!-- <el-table-column label="备注" prop="remark" min-width="180" /> -->
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
         <el-table-column label="操作" width="180" fixed="right">
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-// import { getStaffList, deleteStaff } from '@/api/staff'
+import { getStagePage, deleteStage } from '@/api/stage'
 import Create from './create'
 
 export default {
@@ -73,12 +73,12 @@ export default {
         total: 0
       },
       statusMap: {
-        true: '启用',
-        false: '禁用'
+        enable: '启用',
+        disable: '禁用'
       },
       statusTypeMap: {
-        true: 'success',
-        false: 'danger'
+        enable: 'success',
+        disable: 'danger'
       }
     }
   },
@@ -87,17 +87,21 @@ export default {
   },
   methods: {
     getList() {
-      // this.loading = true
-      // getStaffList({
-      //   userAccount: this.queryForm.code || undefined,
-      //   userName: this.queryForm.name || undefined,
-      //   page: this.pageConfig.page,
-      //   size: this.pageConfig.size
-      // }).then(res => {
-      //   this.tableData = res.data.records
-      //   this.pageConfig.total = res.data.total
-      //   this.loading = false
-      // })
+      this.loading = true
+      getStagePage({
+        queryParam: {
+          code: this.queryForm.code || undefined,
+          name: this.queryForm.name || undefined
+        },
+        pageParam: {
+          page: this.pageConfig.page,
+          size: this.pageConfig.size
+        }
+      }).then(res => {
+        this.tableData = res.data.records
+        this.pageConfig.total = res.data.total
+        this.loading = false
+      })
     },
     query() {
       this.pageConfig.page = 1
@@ -122,9 +126,9 @@ export default {
         await this.$confirm('确定删除该中转区吗？删除后无法恢复。', '系统提示', {
           type: 'warning'
         })
-        // await deleteStaff({
-        //   ids: [row.id]
-        // })
+        await deleteStage({
+          ids: [row.id]
+        })
         this.$message.success({
           message: '删除成功',
           type: 'success'

@@ -7,7 +7,7 @@
   >
     <el-form ref="model" :model="model" :rules="rules" label-width="80px">
       <el-form-item label="产品编号" prop="code">
-        <el-input v-model="model.code" disabled />
+        <el-input v-model="model.code" />
       </el-form-item>
       <el-form-item label="产品名称" prop="name">
         <el-input v-model="model.name" />
@@ -51,7 +51,7 @@ export default {
       loading: false,
       ins: null,
       model: {
-        code: 'PRODUCT_202410020002',
+        code: '',
         name: '',
         category: '',
         spec: '',
