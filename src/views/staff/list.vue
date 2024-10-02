@@ -162,8 +162,14 @@ export default {
         console.log(error)
       }
     },
-    sizeChange() {},
-    pageChange() {}
+    sizeChange(v) {
+      this.pageConfig.size = v
+      this.query()
+    },
+    pageChange(v) {
+      this.pageChange.page = v
+      this.getList()
+    }
   }
 }
 </script>
