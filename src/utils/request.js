@@ -83,7 +83,7 @@ service.interceptors.response.use(
     const code = data.code
     const message = data.message
     handleError(code, message)
-    return Promise.reject(error)
+    return Promise.reject(message)
   }
 )
 

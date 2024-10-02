@@ -35,6 +35,7 @@ if (process.env.NODE_ENV === 'production') {
 // 如果想要中文版 element-ui，按如下方式声明
 ElementUI.Pagination.props.layout.default = 'total, sizes, prev, pager, next'
 ElementUI.Pagination.props.pageSizes.default = () => [10, 50, 100]
+ElementUI.Dialog.props.closeOnClickModal.default = false
 Vue.use(ElementUI, { size: 'small' })
 Vue.config.productionTip = false
 
