@@ -99,6 +99,19 @@ export const constantRoutes = [
     meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo' },
     children: [
       {
+        path: 'category',
+        name: 'Category',
+        component: () => import('@/views/category/index'),
+        children: [
+          {
+            path: 'list',
+            name: 'CategoryList',
+            component: () => import('@/views/category/list'),
+            meta: { title: '产品类别管理', icon: 'iconfont icon-chanpinliebie' }
+          }
+        ]
+      },
+      {
         path: 'product',
         name: 'Product',
         component: () => import('@/views/product/index'),

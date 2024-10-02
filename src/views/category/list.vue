@@ -3,16 +3,8 @@
     <div class="search-panel">
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
       <el-form inline :model="queryForm" class="mt-4">
-        <el-form-item label="产品编号">
-          <el-input v-model="queryForm.code" />
-        </el-form-item>
-        <el-form-item label="产品名称">
+        <el-form-item label="产品类别名称">
           <el-input v-model="queryForm.name" />
-        </el-form-item>
-        <el-form-item label="产品类别">
-          <el-select v-model="queryForm.category" filterable>
-            <el-option v-for="role in categoryList" :key="role.id" :value="role.id" :label="role.name" />
-          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" @click="query">查询</el-button>
@@ -22,15 +14,8 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
-        <el-table-column label="产品编号" prop="code" min-width="180" />
-        <el-table-column label="产品名称" prop="name" min-width="180" />
-        <el-table-column label="产品类别" prop="productCategory.name" min-width="180" />
-        <el-table-column label="规格型号" prop="spec" min-width="180" />
-        <el-table-column label="状态" min-width="180">
-          <template v-slot="{ row }">
-            <el-tag :type="statusTypeMap[row.status]">{{ statusMap[row.status] }}</el-tag>
-          </template>
-        </el-table-column>
+        <el-table-column label="ID" prop="id" min-width="180" />
+        <el-table-column label="产品类别名称" prop="name" min-width="180" />
         <el-table-column label="备注" prop="remark" min-width="180" />
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
@@ -56,21 +41,18 @@
 </template>
 
 <script>
-import { getProductPage, deleteProduct } from '@/api/product'
-import { getCategoryList } from '@/api/category'
+import { getCategoryPage, deleteCategory } from '@/api/category'
 import Create from './create'
 
 export default {
-  name: 'ProductList',
+  name: 'CategoryList',
   components: {
     Create
   },
   data() {
     return {
       queryForm: {
-        code: '',
-        name: '',
-        category: ''
+        name: ''
       },
       loading: false,
       tableData: [],
@@ -78,35 +60,18 @@ export default {
         page: 1,
         size: 10,
         total: 0
-      },
-      statusMap: {
-        enable: '启用',
-        disable: '禁用'
-      },
-      statusTypeMap: {
-        enable: 'success',
-        disable: 'danger'
-      },
-      categoryList: []
+      }
     }
   },
   created() {
-    this.getCategoryList()
     this.getList()
   },
   methods: {
-    getCategoryList() {
-      getCategoryList({}).then((res) => {
-        this.categoryList = res.data
-      })
-    },
     getList() {
       this.loading = true
-      getProductPage({
+      getCategoryPage({
         queryParam: {
-          code: this.queryForm.code || undefined,
-          name: this.queryForm.name || undefined,
-          category: this.queryForm.category || undefined
+          name: this.queryForm.name || undefined
         },
         pageParam: {
           page: this.pageConfig.page,
@@ -124,9 +89,7 @@ export default {
     },
     reset() {
       this.queryForm = {
-        code: '',
-        name: '',
-        category: ''
+        name: ''
       }
       this.pageConfig.page = 1
       this.getList()
@@ -139,10 +102,10 @@ export default {
     },
     async del(row) {
       try {
-        await this.$confirm('确定删除该产品吗？删除后无法恢复。', '系统提示', {
+        await this.$confirm('确定删除该产品类别吗？删除后无法恢复。', '系统提示', {
           type: 'warning'
         })
-        await deleteProduct({
+        await deleteCategory({
           ids: [row.id]
         })
         this.$message.success({
