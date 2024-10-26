@@ -38,14 +38,14 @@
 import { createStage, updateStage } from '@/api/stage'
 
 export default {
-  name: 'CreateProduct',
+  name: 'CreateStage',
   emits: ['success'],
   data() {
     return {
       loading: false,
       ins: null,
       model: {
-        code: 'STAGE_202410020001',
+        code: 'ZZQ_' + new Date().getTime(),
         name: '',
         position: '',
         status: 'enable'

@@ -51,7 +51,7 @@ export default {
       loading: false,
       ins: null,
       model: {
-        code: '',
+        code: 'CP_' + new Date().getTime(),
         name: '',
         category: '',
         spec: '',
@@ -60,6 +60,7 @@ export default {
       },
       dialogVisible: false,
       rules: {
+        code: [{ required: true, message: '请输入产品编号', trigger: ['blur', 'change'] }],
         name: [{ required: true, message: '请输入产品名称', trigger: ['blur', 'change'] }],
         category: [{ required: true, message: '请选择产品类别', trigger: ['blur', 'change'] }],
         spec: [{ required: true, message: '请输入规格型号', trigger: ['blur', 'change'] }]

@@ -45,7 +45,7 @@ export default {
       loading: false,
       ins: null,
       model: {
-        code: '',
+        code: 'GX_' + new Date().getTime(),
         name: '',
         sort: 1,
         status: 'enable',
@@ -53,6 +53,7 @@ export default {
       },
       dialogVisible: false,
       rules: {
+        code: [{ required: true, message: '请输入工序编号', trigger: ['blur', 'change'] }],
         name: [{ required: true, message: '请输入工序名称', trigger: ['blur', 'change'] }],
         sort: [{ required: true, message: '请输入工序排序', trigger: ['blur', 'change'] }]
       }
