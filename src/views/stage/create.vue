@@ -53,6 +53,7 @@ export default {
       },
       dialogVisible: false,
       rules: {
+        code: [{ required: true, message: '请输入中转区编号', trigger: ['blur', 'change'] }],
         name: [{ required: true, message: '请输入中转区名称', trigger: ['blur', 'change'] }],
         position: [{ required: true, message: '请输入中转区位置', trigger: ['blur', 'change'] }]
       }
