@@ -58,20 +58,32 @@ export const constantRoutes = [
   {
     path: '/production',
     component: Layout,
-    redirect: '/production/workOrder',
+    // redirect: '/production/list',
     name: 'Production',
     meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli' },
+    redirect: 'noRedirect',
     children: [
       {
         path: 'workOrder',
         name: 'WorkOrder',
         component: () => import('@/views/workOrder/index'),
+        redirect: '/production/workOrder/list',
         children: [
           {
             path: 'list',
             name: 'WorkOrderList',
             component: () => import('@/views/workOrder/list'),
             meta: { title: '工单管理', icon: 'iconfont icon-gongdan' }
+          },
+          {
+            path: 'detail/:id',
+            name: 'WorkOrderDetail',
+            component: () => import('@/views/workOrder/detail'),
+            hidden: true,
+            meta: {
+              title: '工单详情',
+              activeMenu: '/production/workOrder/list'
+            }
           }
         ]
       },
