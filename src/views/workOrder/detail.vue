@@ -19,19 +19,19 @@
       <el-descriptions-item label="更新时间">{{ ins.updateTime }}</el-descriptions-item>
     </el-descriptions>
     <p class="title">工序相关信息</p>
-    <div v-for="p in ins.procedureList" :key="p.id" class="mb20">
-      <div>{{ p.workingProcedure.name }} ({{ p.workingProcedure.code }})</div>
-      <div>
-        <span>当前认领人：</span>
-        <span>{{ p.userName || '-' }}</span>
+    <div v-for="p in ins.procedureList" :key="p.id" class="gx-box">
+      <div class="head">{{ p.workingProcedure.name }} ({{ p.workingProcedure.code }})</div>
+      <div class="body">
+        <span class="label">当前认领人：</span>
+        <span class="value">{{ p.userName || '-' }}</span>
       </div>
-      <div>
-        <span>认领时间：</span>
-        <span>{{ p.startTime || '-' }}</span>
+      <div class="body">
+        <span class="label">认领时间：</span>
+        <span class="value">{{ p.startTime || '-' }}</span>
       </div>
-      <div>
-        <span>完成情况：</span>
-        <span>{{ p.completeCount }} / {{ p.count }}</span>
+      <div class="body">
+        <span class="label">完成情况：</span>
+        <span class="value">{{ p.completeCount }} / {{ p.count }}</span>
       </div>
       <div>
         <el-progress class="w-1/4" :stroke-width="12" :color="customColors" :percentage="Number(((p.completeCount / p.count) * 100).toFixed(0))" />
@@ -82,7 +82,25 @@ export default {
   margin-bottom: 20px;
   margin-top: 20px;
 }
-.mb20 {
+.gx-box {
   margin-bottom: 20px;
+  width: 50%;
+  background-color: #fafafa;
+  padding: 16px;
+  line-height: 26px;
+  .body {
+    font-size: 14px;
+    .label {
+      color: #909399;
+    }
+    .value {
+      color: #606266;
+    }
+  }
+  .head {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
 }
 </style>
