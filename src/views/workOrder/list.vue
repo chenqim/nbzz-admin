@@ -168,7 +168,7 @@ export default {
       this.query()
     },
     pageChange(v) {
-      this.pageChange.page = v
+      this.pageConfig.page = v
       this.getList()
     }
   }

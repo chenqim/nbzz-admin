@@ -47,10 +47,12 @@
       </div>
     </div>
     <create ref="createRef" @success="getList" />
+    <!-- <div class="qrcode" ref="qrCodeUrl"></div> -->
   </div>
 </template>
 
 <script>
+import QRCode from 'qrcodejs2'
 import { getStagePage, deleteStage } from '@/api/stage'
 import Create from './create'
 
@@ -138,7 +140,9 @@ export default {
         console.log(error)
       }
     },
-    downloadQRCode() {},
+    downloadQRCode(row) {
+      this.downLoad(row.code, '500*500')
+    },
     sizeChange(v) {
       this.pageConfig.size = v
       this.query()
@@ -146,9 +150,41 @@ export default {
     pageChange(v) {
       this.pageChange.page = v
       this.getList()
+    },
+    createQRCode(text, el, size) {
+      const [width, height] = size.split('*')
+      new QRCode(el, {
+        text: text,
+        width: width,
+        height: height,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      })
+    },
+    downLoad(text, size) {
+      const div = document.createElement('div')
+      this.createQRCode(text, div, size)
+      const canvas = div.querySelector('canvas')
+      const imgurl = canvas.toDataURL('image/jpeg')
+      const a = document.createElement('a')
+      a.href = imgurl
+      a.download = text // 图片名称
+      a.click()
     }
   }
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+// .qrcode{
+//   display: inline-block;
+//   img {
+//     width: 132px;
+//     height: 132px;
+//     background-color: #fff; //设置白色背景色
+//     padding: 6px; // 利用padding的特性，挤出白边
+//     box-sizing: border-box;
+//   }
+// }
+</style>
