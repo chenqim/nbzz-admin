@@ -20,7 +20,7 @@
     </el-descriptions>
     <p class="title">工序相关信息</p>
     <div v-for="p in ins.procedureList" :key="p.id" class="gx-box">
-      <div class="head">{{ p.workingProcedure.name }} ({{ p.workingProcedure.code }})</div>
+      <div class="head">{{ p.workingProcedure.name }} [ {{ p.workingProcedure.code }} ]</div>
       <div class="body">
         <span class="label">当前认领人：</span>
         <span class="value">{{ p.userName || '-' }}</span>

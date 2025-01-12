@@ -44,7 +44,7 @@
           <template v-slot="{ row }">
             <el-button type="text" :disabled="row.userAccount === 'admin'" @click="update(row)">修改</el-button>
             <el-button type="text" :disabled="row.userAccount === 'admin'" @click="del(row)">删除</el-button>
-            <el-button type="text" @click="unbindWx(row)">解绑微信号</el-button>
+            <!-- <el-button type="text" @click="unbindWx(row)">解绑微信号</el-button> -->
           </template>
         </el-table-column>
       </el-table>

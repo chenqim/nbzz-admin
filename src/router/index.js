@@ -86,20 +86,20 @@ export const constantRoutes = [
             }
           }
         ]
-      },
-      {
-        path: 'manufacturing',
-        name: 'Manufacturing',
-        component: () => import('@/views/manufacturing/index'),
-        children: [
-          {
-            path: 'list',
-            name: 'ManufacturingList',
-            component: () => import('@/views/manufacturing/list'),
-            meta: { title: '制造执行', icon: 'iconfont icon-zhizaozhixing' }
-          }
-        ]
       }
+      // {
+      //   path: 'manufacturing',
+      //   name: 'Manufacturing',
+      //   component: () => import('@/views/manufacturing/index'),
+      //   children: [
+      //     {
+      //       path: 'list',
+      //       name: 'ManufacturingList',
+      //       component: () => import('@/views/manufacturing/list'),
+      //       meta: { title: '制造执行', icon: 'iconfont icon-zhizaozhixing' }
+      //     }
+      //   ]
+      // }
     ]
   },
 

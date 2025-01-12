@@ -19,6 +19,7 @@ config.statusMap = {
   create: '已创建',
   receive: '已认领',
   producing: '生产中',
+  executed: '待发货',
   completed: '已完成'
 }
 
@@ -26,6 +27,7 @@ config.statusTypeMap = {
   create: 'info',
   receive: 'primary',
   producing: 'warning',
+  executed: 'danger',
   completed: 'success'
 }
 

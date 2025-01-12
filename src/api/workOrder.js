@@ -39,3 +39,11 @@ export function getWorkOrderDetail(data) {
     data
   })
 }
+
+export function deliveryOrder(data) {
+  return request({
+    url: '/workOrder/deliveryOrder',
+    method: 'post',
+    data
+  })
+}

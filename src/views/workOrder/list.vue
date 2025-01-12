@@ -52,6 +52,7 @@
             <el-button type="text" @click="detail(row)">详情</el-button>
             <el-button type="text" :disabled="row.status !== 'create'" @click="update(row)">修改</el-button>
             <el-button type="text" :disabled="row.status !== 'create'" @click="del(row)">删除</el-button>
+            <el-button type="text" :disabled="row.status !== 'executed'" @click="send(row)">发货</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -71,7 +72,7 @@
 
 <script>
 import config from './config'
-import { getWorkOrderPage, deleteWorkOrder } from '@/api/workOrder'
+import { getWorkOrderPage, deleteWorkOrder, deliveryOrder } from '@/api/workOrder'
 import Create from './create'
 
 export default {
@@ -148,6 +149,23 @@ export default {
         })
         this.$message.success({
           message: '删除成功',
+          type: 'success'
+        })
+        this.getList()
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async send(row) {
+      try {
+        await this.$confirm('是否确认发货？请确保线下发货后再进行该操作。', '系统提示', {
+          type: 'warning'
+        })
+        await deliveryOrder({
+          id: row.id
+        })
+        this.$message.success({
+          message: '操作成功',
           type: 'success'
         })
         this.getList()
