@@ -47,3 +47,27 @@ export function deliveryOrder(data) {
     data
   })
 }
+
+export function queryLatelyByPage(data) {
+  return request({
+    url: '/workOrder/queryLatelyByPage',
+    method: 'post',
+    data
+  })
+}
+
+export function queryOrderAchieveTotal(data) {
+  return request({
+    url: '/wxapp/boss/queryOrderAchieveTotal',
+    method: 'post',
+    data
+  })
+}
+
+export function queryProduceExecuteTotal(data) {
+  return request({
+    url: '/wxapp/boss/queryProduceExecuteTotal',
+    method: 'post',
+    data
+  })
+}

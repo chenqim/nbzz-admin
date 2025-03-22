@@ -106,9 +106,10 @@ export const constantRoutes = [
   {
     path: '/factory',
     component: Layout,
-    redirect: '/factory/product',
+    // redirect: '/factory/product',
     name: 'Factory',
     meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo' },
+    redirect: 'noRedirect',
     children: [
       {
         path: 'category',
@@ -168,9 +169,10 @@ export const constantRoutes = [
   {
     path: '/system',
     component: Layout,
-    redirect: '/system/staff',
+    // redirect: '/system/staff',
     name: 'System',
     meta: { title: '系统管理', icon: 'el-icon-s-tools' },
+    redirect: 'noRedirect',
     children: [
       {
         path: 'staff',
