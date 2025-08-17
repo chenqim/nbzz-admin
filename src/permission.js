@@ -31,10 +31,27 @@ router.beforeEach(async(to, from, next) => {
         next()
       } else {
         try {
-          // get user info
-          await store.dispatch('user/getInfo')
+          const hasRoutes = store.getters.permission_routes && store.getters.permission_routes.length > 0
+          if (hasRoutes) {
+            next()
+          } else {
+            // get user info
+            // await store.dispatch('user/getInfo')
+            // next()
 
-          next()
+            // get user info
+            // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
+            const data = await store.dispatch('user/getInfo')
+            const roles = data?.userInfo?.roles?.map(n => n.roleCode) || []
+            // generate accessible routes map based on roles
+            const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+            // dynamically add accessible routes
+            router.addRoutes(accessRoutes)
+            console.log('reouter', router.options)
+            // hack method to ensure that addRoutes is complete
+            // set the replace: true, so the navigation will not leave a history record
+            next({ ...to, replace: true })
+          }
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')

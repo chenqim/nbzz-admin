@@ -55,12 +55,17 @@ export const constantRoutes = [
     }]
   },
 
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
+]
+
+export const asyncRoutes = [
   {
     path: '/production',
     component: Layout,
     // redirect: '/production/list',
     name: 'Production',
-    meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli' },
+    meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli', roles: ['Admin', 'Boss', 'Leader'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -108,7 +113,7 @@ export const constantRoutes = [
     component: Layout,
     // redirect: '/factory/product',
     name: 'Factory',
-    meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo' },
+    meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo', roles: ['Admin', 'Boss'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -171,7 +176,7 @@ export const constantRoutes = [
     component: Layout,
     // redirect: '/system/staff',
     name: 'System',
-    meta: { title: '系统管理', icon: 'el-icon-s-tools' },
+    meta: { title: '系统管理', icon: 'el-icon-s-tools', roles: ['Admin', 'Boss'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -189,10 +194,9 @@ export const constantRoutes = [
         ]
       }
     ]
-  },
-
+  }
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
