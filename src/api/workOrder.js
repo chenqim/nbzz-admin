@@ -71,3 +71,19 @@ export function queryProduceExecuteTotal(data) {
     data
   })
 }
+
+export function queryWorkingProcedureList(data) {
+  return request({
+    url: '/workOrder/queryWorkingProcedureList',
+    method: 'post',
+    data
+  })
+}
+
+export function updateWorkingProcedure(data) {
+  return request({
+    url: '/workOrder/updateWorkingProcedure',
+    method: 'post',
+    data
+  })
+}

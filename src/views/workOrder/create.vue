@@ -20,7 +20,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="生产产品" prop="productInfoId">
-        <el-select v-model="model.productInfoId" filterable class="w-full">
+        <el-select v-model="model.productInfoId" filterable class="w-full" @change="productChange">
           <el-option v-for="n in productList" :key="n.id" :value="n.id" :label="n.name" />
         </el-select>
       </el-form-item>
@@ -34,9 +34,10 @@
         <el-date-picker v-model="model.needDate" type="date" placeholder="选择日期" class="w-full" />
       </el-form-item>
       <el-form-item label="关联工序" prop="procedureList">
-        <el-checkbox-group v-model="model.procedureList">
+        <el-checkbox-group v-if="processList?.length" v-model="model.procedureList">
           <el-checkbox v-for="n in processList" :key="n.id" :label="n.id">{{ n.name }}</el-checkbox>
         </el-checkbox-group>
+        <span v-else>请先选择生产产品</span>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="model.remark" type="textarea" :rows="3" resize="none" />
@@ -54,8 +55,7 @@
 <script>
 import config from './config'
 import { getProductList } from '@/api/product'
-import { getProcessList } from '@/api/process'
-import { createWorkOrder, updateWorkOrder, getWorkOrderDetail } from '@/api/workOrder'
+import { createWorkOrder, updateWorkingProcedure, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
 
 export default {
   name: 'CreateWorkOrder',
@@ -103,10 +103,20 @@ export default {
         this.productList = res.data
       })
     },
-    getProcessList() {
-      getProcessList({}).then(res => {
+    getProcessList(productCategoryId) {
+      if (!productCategoryId) {
+        this.processList = []
+        return
+      }
+      queryWorkingProcedureList({
+        productCategoryId
+      }).then(res => {
         this.processList = res.data
       })
+    },
+    productChange(v) {
+      const product = this.productList.find(n => n.id === v)
+      this.getProcessList(product.productCategoryId)
     },
     ok() {
       this.$refs.model.validate((valid) => {
@@ -142,7 +152,7 @@ export default {
     async update() {
       try {
         this.loading = true
-        await updateWorkOrder(this.handleParams())
+        await updateWorkingProcedure(this.handleParams())
         this.$message({
           type: 'success',
           message: '修改成功'
@@ -174,9 +184,9 @@ export default {
         this.getDetail().then(procedureList => {
           this.setDefault(procedureList)
         })
+        this.getProcessList(ins?.productInfo?.productCategoryId)
       }
       this.getProductList()
-      this.getProcessList()
       this.dialogVisible = true
     },
     close() {

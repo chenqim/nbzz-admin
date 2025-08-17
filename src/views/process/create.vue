@@ -12,6 +12,11 @@
       <el-form-item label="工序名称" prop="name">
         <el-input v-model="model.name" />
       </el-form-item>
+      <el-form-item label="产品类别">
+        <el-select v-model="model.category" clearable filterable class="w-full">
+          <el-option v-for="role in categoryList" :key="role.id" :value="role.id" :label="role.name" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="工序排序" prop="sort">
         <el-input-number v-model="model.sort" />
       </el-form-item>
@@ -36,6 +41,7 @@
 
 <script>
 import { createProcess, updateProcess } from '@/api/process'
+import { getCategoryList } from '@/api/category'
 
 export default {
   name: 'CreateProcess',
@@ -48,6 +54,7 @@ export default {
         code: 'GX_' + new Date().getTime(),
         name: '',
         sort: 1,
+        category: '',
         status: 'enable',
         remark: ''
       },
@@ -56,7 +63,9 @@ export default {
         code: [{ required: true, message: '请输入工序编号', trigger: ['blur', 'change'] }],
         name: [{ required: true, message: '请输入工序名称', trigger: ['blur', 'change'] }],
         sort: [{ required: true, message: '请输入工序排序', trigger: ['blur', 'change'] }]
-      }
+        // category: [{ required: true, message: '请选择产品类别', trigger: ['blur', 'change'] }]
+      },
+      categoryList: []
     }
   },
   created() {},
@@ -77,6 +86,7 @@ export default {
         id: this.ins ? this.ins.id : undefined,
         code: this.model.code,
         name: this.model.name,
+        productCategoryId: this.model.category,
         sort: this.model.sort,
         status: this.model.status,
         remark: this.model.remark
@@ -114,10 +124,17 @@ export default {
       this.model.code = this.ins.code
       this.model.name = this.ins.name
       this.model.sort = this.ins.sort
+      this.model.category = this.ins.productCategoryId
       this.model.status = this.ins.status
       this.model.remark = this.ins.remark
     },
+    getCategoryList() {
+      getCategoryList({}).then((res) => {
+        this.categoryList = res.data
+      })
+    },
     open(ins) {
+      this.getCategoryList()
       this.ins = ins
       if (ins) {
         this.setDefault()
