@@ -63,7 +63,6 @@ const actions = {
     })
   },
   clearRoutes({ commit }, roles) {
-    debugger
     commit('CLEAR_ROUTES')
   }
 }
