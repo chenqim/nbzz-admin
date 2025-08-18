@@ -55,7 +55,7 @@
 <script>
 import config from './config'
 import { getProductList } from '@/api/product'
-import { createWorkOrder, updateWorkingProcedure, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
+import { createWorkOrder, updateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
 
 export default {
   name: 'CreateWorkOrder',
@@ -153,7 +153,7 @@ export default {
     async update() {
       try {
         this.loading = true
-        await updateWorkingProcedure(this.handleParams())
+        await updateWorkOrder(this.handleParams())
         this.$message({
           type: 'success',
           message: '修改成功'

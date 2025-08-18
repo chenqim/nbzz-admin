@@ -40,7 +40,8 @@
 </template>
 
 <script>
-import { createProcess, updateProcess } from '@/api/process'
+import { createProcess } from '@/api/process'
+import { updateWorkingProcedure } from '@/api/workOrder'
 import { getCategoryList } from '@/api/category'
 
 export default {
@@ -109,7 +110,7 @@ export default {
     async update() {
       try {
         this.loading = true
-        await updateProcess(this.handleParams())
+        await updateWorkingProcedure(this.handleParams())
         this.$message({
           type: 'success',
           message: '修改成功'
