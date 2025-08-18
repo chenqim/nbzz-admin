@@ -53,9 +53,9 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
-
-        commit('SET_NAME', name)
+        const { userName, avatar } = data.userInfo
+        // 这里没有设置 userName 的话会引起路由跳转死循环
+        commit('SET_NAME', userName)
         commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {

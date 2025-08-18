@@ -53,10 +53,10 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '总览', icon: 'dashboard' }
     }]
-  },
+  }
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 export const asyncRoutes = [
@@ -78,7 +78,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'WorkOrderList',
             component: () => import('@/views/workOrder/list'),
-            meta: { title: '工单管理', icon: 'iconfont icon-gongdan' }
+            meta: { title: '工单管理', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss', 'Leader'] }
           },
           {
             path: 'detail/:id',
@@ -87,7 +87,8 @@ export const asyncRoutes = [
             hidden: true,
             meta: {
               title: '工单详情',
-              activeMenu: '/production/workOrder/list'
+              activeMenu: '/production/workOrder/list',
+              roles: ['Admin', 'Boss', 'Leader']
             }
           }
         ]
@@ -125,7 +126,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'CategoryList',
             component: () => import('@/views/category/list'),
-            meta: { title: '产品类别管理', icon: 'iconfont icon-chanpinliebie' }
+            meta: { title: '产品类别管理', icon: 'iconfont icon-chanpinliebie', roles: ['Admin', 'Boss'] }
           }
         ]
       },
@@ -138,7 +139,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'ProductList',
             component: () => import('@/views/product/list'),
-            meta: { title: '产品管理', icon: 'iconfont icon-chanpin' }
+            meta: { title: '产品管理', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss'] }
           }
         ]
       },
@@ -151,7 +152,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'ProcessList',
             component: () => import('@/views/process/list'),
-            meta: { title: '工序管理', icon: 'iconfont icon-gongxu' }
+            meta: { title: '工序管理', icon: 'iconfont icon-gongxu', roles: ['Admin', 'Boss'] }
           }
         ]
       },
@@ -164,7 +165,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'StageList',
             component: () => import('@/views/stage/list'),
-            meta: { title: '中转区管理', icon: 'iconfont icon-zhongzhuanqu' }
+            meta: { title: '中转区管理', icon: 'iconfont icon-zhongzhuanqu', roles: ['Admin', 'Boss'] }
           }
         ]
       }
@@ -189,14 +190,14 @@ export const asyncRoutes = [
             path: 'list',
             name: 'StaffList',
             component: () => import('@/views/staff/list'),
-            meta: { title: '员工管理', icon: 'el-icon-user-solid' }
+            meta: { title: '员工管理', icon: 'el-icon-user-solid', roles: ['Admin', 'Boss'] }
           }
         ]
       }
     ]
-  }
+  },
   // 404 page must be placed at the end !!!
-  // { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({

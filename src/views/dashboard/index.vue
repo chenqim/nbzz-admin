@@ -262,10 +262,11 @@ export default {
     },
     detail(row) {
       this.$router.push({
-        name: 'WorkOrderDetail',
-        params: {
-          id: row.id
-        }
+        // name: 'WorkOrderDetail',
+        // params: {
+        //   id: row.id
+        // }
+        path: `/production/workOrder/detail/${row.id}`
       })
     },
     sizeChange(v) {
