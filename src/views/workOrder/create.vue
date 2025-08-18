@@ -104,6 +104,7 @@ export default {
       })
     },
     getProcessList(productCategoryId) {
+      this.model.procedureList = []
       if (!productCategoryId) {
         this.processList = []
         return
