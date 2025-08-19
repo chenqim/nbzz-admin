@@ -16,9 +16,25 @@ export function deleteWorkOrder(data) {
   })
 }
 
+export function forceDeleteWorkOrder(data) {
+  return request({
+    url: '/workOrder/forceRealDelete',
+    method: 'post',
+    data
+  })
+}
+
 export function updateWorkOrder(data) {
   return request({
     url: '/workOrder/update',
+    method: 'post',
+    data
+  })
+}
+
+export function forceUpdateWorkOrder(data) {
+  return request({
+    url: '/workOrder/forceUpdate',
     method: 'post',
     data
   })

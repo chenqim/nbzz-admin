@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="!ins ? '创建工单' : '修改工单'"
+    :title="!ins ? '创建工单' : isForce ? '强制修改工单' : '修改工单'"
     :visible.sync="dialogVisible"
     width="501px"
     @close="close"
@@ -20,7 +20,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="生产产品" prop="productInfoId">
-        <el-select v-model="model.productInfoId" filterable class="w-full" @change="productChange">
+        <el-select v-model="model.productInfoId" filterable class="w-full" :disabled="isForce" @change="productChange">
           <el-option v-for="n in productList" :key="n.id" :value="n.id" :label="n.name" />
         </el-select>
       </el-form-item>
@@ -35,7 +35,7 @@
       </el-form-item>
       <el-form-item label="关联工序" prop="procedureList">
         <el-checkbox-group v-if="processList?.length" v-model="model.procedureList">
-          <el-checkbox v-for="n in processList" :key="n.id" :label="n.id">{{ n.name }}</el-checkbox>
+          <el-checkbox v-for="n in processList" :key="n.id" :label="n.id" :disabled="isForce">{{ n.name }}</el-checkbox>
         </el-checkbox-group>
         <span v-else>请先选择生产产品</span>
       </el-form-item>
@@ -55,7 +55,7 @@
 <script>
 import config from './config'
 import { getProductList } from '@/api/product'
-import { createWorkOrder, updateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
+import { createWorkOrder, updateWorkOrder, forceUpdateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
 
 export default {
   name: 'CreateWorkOrder',
@@ -153,7 +153,11 @@ export default {
     async update() {
       try {
         this.loading = true
-        await updateWorkOrder(this.handleParams())
+        if (this.isForce) {
+          await forceUpdateWorkOrder(this.handleParams())
+        } else {
+          await updateWorkOrder(this.handleParams())
+        }
         this.$message({
           type: 'success',
           message: '修改成功'
@@ -179,8 +183,9 @@ export default {
       // this.model.procedureList = procedureList.map(n => n.workingProcedureId)
       // this.model.remark = this.ins.remark
     },
-    open(ins) {
+    open(ins, isForce) {
       this.ins = ins
+      this.isForce = isForce
       if (ins) {
         this.getDetail().then(procedureList => {
           this.setDefault(procedureList)

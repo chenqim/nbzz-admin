@@ -6,7 +6,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    roles: []
   }
 }
 
@@ -24,6 +25,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles
   }
 }
 
@@ -53,10 +57,11 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { userName, avatar } = data.userInfo
+        const { userName, avatar, roles } = data.userInfo
         // 这里没有设置 userName 的话会引起路由跳转死循环
         commit('SET_NAME', userName)
         commit('SET_AVATAR', avatar)
+        commit('SET_ROLES', roles.map(n => n.roleCode))
         resolve(data)
       }).catch(error => {
         reject(error)

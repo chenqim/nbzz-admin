@@ -53,6 +53,10 @@
             <el-button type="text" :disabled="row.status !== 'create'" @click="update(row)">修改</el-button>
             <el-button type="text" :disabled="row.status !== 'create'" @click="del(row)">删除</el-button>
             <el-button type="text" :disabled="row.status !== 'executed'" @click="send(row)">发货</el-button>
+            <div v-if="hasPermission">
+              <el-button type="text" @click="update(row, true)">强制修改</el-button>
+              <el-button type="text" @click="del(row, true)">强制删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -71,8 +75,9 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import config from './config'
-import { getWorkOrderPage, deleteWorkOrder, deliveryOrder } from '@/api/workOrder'
+import { getWorkOrderPage, deleteWorkOrder, forceDeleteWorkOrder, deliveryOrder } from '@/api/workOrder'
 import Create from './create'
 
 export default {
@@ -97,8 +102,15 @@ export default {
       config
     }
   },
+  computed: {
+    ...mapGetters(['roles']),
+    hasPermission() {
+      return this.roles.includes('Admin')
+    }
+  },
   created() {
     this.getList()
+    console.log(this.roles)
   },
   methods: {
     getList() {
@@ -136,17 +148,23 @@ export default {
     create() {
       this.$refs.createRef.open()
     },
-    update(row) {
-      this.$refs.createRef.open(row)
+    update(row, isForce) {
+      this.$refs.createRef.open(row, isForce)
     },
-    async del(row) {
+    async del(row, isForce) {
       try {
-        await this.$confirm('确定删除该工单吗？删除后无法恢复。', '系统提示', {
+        await this.$confirm(isForce ? '确定强制删除该工单吗？删除后无法恢复。' : '确定删除该工单吗？删除后无法恢复。', '系统提示', {
           type: 'warning'
         })
-        await deleteWorkOrder({
-          id: row.id
-        })
+        if (isForce) {
+          await forceDeleteWorkOrder({
+            id: row.id
+          })
+        } else {
+          await deleteWorkOrder({
+            id: row.id
+          })
+        }
         this.$message.success({
           message: '删除成功',
           type: 'success'
