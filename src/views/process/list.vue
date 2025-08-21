@@ -19,13 +19,22 @@
       <el-table v-loading="loading" :data="tableData">
         <el-table-column label="工序编号" prop="code" min-width="180" />
         <el-table-column label="工序名称" prop="name" min-width="180" />
+        <el-table-column label="产品类别" prop="productCategory.name" min-width="180">
+          <template v-slot="{ row }">
+            <span>{{ row.productCategory?.name || '-' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="工序排序" prop="sort" min-width="180" />
         <el-table-column label="状态" min-width="180">
           <template v-slot="{ row }">
             <el-tag :type="statusTypeMap[row.status]">{{ statusMap[row.status] }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="备注" prop="remark" min-width="180" />
+        <el-table-column label="备注" min-width="180">
+          <template v-slot="{ row }">
+            <span>{{ row.remark || '-' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
         <el-table-column label="操作" width="180" fixed="right">
