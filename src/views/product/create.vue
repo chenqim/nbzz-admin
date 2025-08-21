@@ -26,10 +26,10 @@
           class="w-full"
         >
           <el-option
-            v-for="item in productList"
-            :key="item.name"
-            :label="item.name"
-            :value="item.name"
+            v-for="item in mainNameList"
+            :key="item"
+            :label="item"
+            :value="item"
           />
         </el-select>
       </el-form-item>
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { createProduct, updateProduct, getProductList } from '@/api/product'
+import { createProduct, updateProduct, queryMainNameList } from '@/api/product'
 import { getCategoryList } from '@/api/category'
 
 export default {
@@ -79,19 +79,19 @@ export default {
       rules: {
         code: [{ required: true, message: '请输入产品编号', trigger: ['blur', 'change'] }],
         // name: [{ required: true, message: '请输入产品名称', trigger: ['blur', 'change'] }],
-        mainName: [{ required: true, message: '请输入产品', trigger: ['blur', 'change'] }],
+        mainName: [{ required: true, message: '请选择或输入产品', trigger: ['blur', 'change'] }],
         category: [{ required: true, message: '请选择产品类别', trigger: ['blur', 'change'] }],
         spec: [{ required: true, message: '请输入规格型号', trigger: ['blur', 'change'] }]
       },
       categoryList: [],
-      productList: []
+      mainNameList: []
     }
   },
   created() {},
   methods: {
-    getProductList() {
-      getProductList({}).then(res => {
-        this.productList = res.data
+    getMainNameList() {
+      queryMainNameList({}).then(res => {
+        this.mainNameList = res.data
       })
     },
     ok() {
@@ -111,6 +111,7 @@ export default {
         code: this.model.code,
         // name: this.model.name,
         productCategoryId: this.model.category,
+        mainName: this.model.mainName,
         spec: this.model.spec,
         status: this.model.status,
         remark: this.model.remark
@@ -148,6 +149,7 @@ export default {
       this.model.code = this.ins.code
       // this.model.name = this.ins.name
       this.model.category = this.ins.productCategoryId
+      this.model.mainName = this.ins.mainName
       this.model.spec = this.ins.spec
       this.model.status = this.ins.status
       this.model.remark = this.ins.remark
@@ -163,7 +165,7 @@ export default {
       if (ins) {
         this.setDefault()
       }
-      this.getProductList()
+      this.getMainNameList()
       this.dialogVisible = true
     },
     close() {

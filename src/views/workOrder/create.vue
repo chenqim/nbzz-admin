@@ -24,6 +24,22 @@
           <el-option v-for="n in productCategoryList" :key="n.id" :value="n.id" :label="n.name" />
         </el-select>
       </el-form-item>
+      <el-form-item label="产品" prop="mainName">
+        <el-select
+          v-model="model.mainName"
+          :disabled="isForce"
+          filterable
+          class="w-full"
+          @change="mainNameChange"
+        >
+          <el-option
+            v-for="item in mainNameList"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="生产产品" prop="productInfoId">
         <el-select v-model="model.productInfoId" filterable class="w-full" :disabled="isForce" @change="productChange">
           <el-option v-for="n in productList" :key="n.id" :value="n.id" :label="n.name" />
@@ -59,7 +75,7 @@
 
 <script>
 import config from './config'
-import { getProductList } from '@/api/product'
+import { getProductList, queryMainNameList } from '@/api/product'
 import { createWorkOrder, updateWorkOrder, forceUpdateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
 import { getCategoryList } from '@/api/category'
 
@@ -76,6 +92,7 @@ export default {
         type: 'produce',
         productCategoryId: '',
         productInfoId: '',
+        mainName: '',
         count: 1,
         execDate: '',
         needDate: '',
@@ -88,6 +105,7 @@ export default {
         grade: [{ required: true, message: '请选择工单级别', trigger: ['change'] }],
         type: [{ required: true, message: '请选择工单类型', trigger: ['change'] }],
         productCategoryId: [{ required: true, message: '请选择产品类别', trigger: ['change'] }],
+        mainName: [{ required: true, message: '请选择产品', trigger: ['change'] }],
         productInfoId: [{ required: true, message: '请选择生产产品', trigger: ['change'] }],
         count: [{ required: true, message: '请输入生产数量', trigger: ['blur', 'change'] }],
         execDate: [{ required: true, message: '请选择执行日期', trigger: ['change'] }],
@@ -98,11 +116,24 @@ export default {
       productList: [],
       processList: [],
       config,
-      isForce: false
+      isForce: false,
+      mainNameList: []
     }
   },
   created() {},
   methods: {
+    getMainNameList(productCategoryId) {
+      this.model.mainName = ''
+      if (!productCategoryId) {
+        this.mainNameList = []
+        return
+      }
+      queryMainNameList({
+        productCategoryId
+      }).then(res => {
+        this.mainNameList = res.data
+      })
+    },
     getDetail() {
       return getWorkOrderDetail({ id: this.ins.id }).then(res => {
         return res.data.procedureList
@@ -112,14 +143,15 @@ export default {
       const res = await getCategoryList({})
       this.productCategoryList = res.data
     },
-    getProductList(productCategoryId) {
+    getProductList(productCategoryId, mainName) {
       this.model.productInfoId = ''
-      if (!productCategoryId) {
+      if (!productCategoryId || !mainName) {
         this.productList = []
         return
       }
       getProductList({
-        productCategoryId
+        productCategoryId,
+        mainName
       }).then(res => {
         this.productList = res.data
       })
@@ -137,8 +169,12 @@ export default {
       })
     },
     productCategoryChange(v) {
-      this.getProductList(v)
       this.getProcessList(v)
+      this.getMainNameList(v)
+      this.getProductList(v, this.model.mainName)
+    },
+    mainNameChange(v) {
+      this.getProductList(this.model.productCategoryId, v)
     },
     productChange(v) {
       // const product = this.productList.find(n => n.id === v)
@@ -197,6 +233,7 @@ export default {
       this.model = {
         ...this.ins,
         productCategoryId: this.ins.productInfo?.productCategoryId,
+        mainName: this.ins.productInfo?.mainName,
         procedureList: procedureList.map(n => n.workingProcedureId)
       }
       // this.model.name = this.ins.name
@@ -217,7 +254,8 @@ export default {
         this.getDetail().then(procedureList => {
           this.setDefault(procedureList)
         })
-        this.getProductList(ins?.productInfo?.productCategoryId)
+        this.getMainNameList(ins?.productInfo?.productCategoryId)
+        this.getProductList(ins?.productInfo?.productCategoryId, ins?.productInfo?.mainName)
         this.getProcessList(ins?.productInfo?.productCategoryId)
       }
       this.dialogVisible = true

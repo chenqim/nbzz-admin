@@ -2,7 +2,8 @@ import request from '@/utils/request'
 
 export function createProduct(data) {
   return request({
-    url: '/dataAdmin/bizProductInfo/create',
+    // url: '/dataAdmin/bizProductInfo/create',
+    url: '/productInfo/create',
     method: 'post',
     data
   })
@@ -18,7 +19,8 @@ export function deleteProduct(data) {
 
 export function updateProduct(data) {
   return request({
-    url: '/dataAdmin/bizProductInfo/update',
+    // url: '/dataAdmin/bizProductInfo/update',
+    url: '/productInfo/update',
     method: 'post',
     data
   })
@@ -26,7 +28,8 @@ export function updateProduct(data) {
 
 export function getProductPage(data) {
   return request({
-    url: '/dataAdmin/bizProductInfo/queryByPage',
+    // url: '/dataAdmin/bizProductInfo/queryByPage',
+    url: '/productInfo/queryByPage',
     method: 'post',
     data
   })
@@ -34,7 +37,16 @@ export function getProductPage(data) {
 
 export function getProductList(data) {
   return request({
-    url: '/dataAdmin/bizProductInfo/queryByList',
+    // url: '/dataAdmin/bizProductInfo/queryByList',
+    url: '/productInfo/queryByList',
+    method: 'post',
+    data
+  })
+}
+
+export function queryMainNameList(data) {
+  return request({
+    url: '/productInfo/queryMainNameList',
     method: 'post',
     data
   })
