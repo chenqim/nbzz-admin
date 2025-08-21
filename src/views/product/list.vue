@@ -10,8 +10,13 @@
           <el-input v-model="queryForm.name" />
         </el-form-item>
         <el-form-item label="产品类别">
-          <el-select v-model="queryForm.category" filterable>
+          <el-select v-model="queryForm.category" filterable clearable>
             <el-option v-for="role in categoryList" :key="role.id" :value="role.id" :label="role.name" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="产品">
+          <el-select v-model="queryForm.mainName" filterable clearable>
+            <el-option v-for="role in mainNameList" :key="role" :value="role" :label="role" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -25,6 +30,7 @@
         <el-table-column label="产品编号" prop="code" min-width="180" />
         <el-table-column label="产品名称" prop="name" min-width="180" />
         <el-table-column label="产品类别" prop="productCategory.name" min-width="180" />
+        <el-table-column label="产品" prop="mainName" min-width="180" />
         <el-table-column label="规格型号" prop="spec" min-width="180" />
         <el-table-column label="状态" min-width="180">
           <template v-slot="{ row }">
@@ -56,7 +62,7 @@
 </template>
 
 <script>
-import { getProductPage, deleteProduct } from '@/api/product'
+import { getProductPage, deleteProduct, queryMainNameList } from '@/api/product'
 import { getCategoryList } from '@/api/category'
 import Create from './create'
 
@@ -70,7 +76,8 @@ export default {
       queryForm: {
         code: '',
         name: '',
-        category: ''
+        category: '',
+        mainName: ''
       },
       loading: false,
       tableData: [],
@@ -87,11 +94,13 @@ export default {
         enable: 'success',
         disable: 'danger'
       },
-      categoryList: []
+      categoryList: [],
+      mainNameList: []
     }
   },
   created() {
     this.getCategoryList()
+    this.getMainNameList()
     this.getList()
   },
   methods: {
@@ -100,13 +109,19 @@ export default {
         this.categoryList = res.data
       })
     },
+    getMainNameList() {
+      queryMainNameList({}).then(res => {
+        this.mainNameList = res.data
+      })
+    },
     getList() {
       this.loading = true
       getProductPage({
         queryParam: {
           code: this.queryForm.code || undefined,
           name: this.queryForm.name || undefined,
-          productCategoryId: this.queryForm.category || undefined
+          productCategoryId: this.queryForm.category || undefined,
+          mainName: this.queryForm.mainName || undefined
         },
         pageParam: {
           page: this.pageConfig.page,
