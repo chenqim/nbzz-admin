@@ -106,7 +106,7 @@ export default {
         queryParam: {
           code: this.queryForm.code || undefined,
           name: this.queryForm.name || undefined,
-          category: this.queryForm.category || undefined
+          productCategoryId: this.queryForm.category || undefined
         },
         pageParam: {
           page: this.pageConfig.page,

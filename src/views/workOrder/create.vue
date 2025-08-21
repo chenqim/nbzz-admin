@@ -19,6 +19,11 @@
           <el-option v-for="n in Object.keys(config.typeMap)" :key="n" :value="n" :label="config.typeMap[n]" />
         </el-select>
       </el-form-item>
+      <el-form-item label="产品类别" prop="productCategoryId">
+        <el-select v-model="model.productCategoryId" filterable class="w-full" :disabled="isForce" @change="productCategoryChange">
+          <el-option v-for="n in productCategoryList" :key="n.id" :value="n.id" :label="n.name" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="生产产品" prop="productInfoId">
         <el-select v-model="model.productInfoId" filterable class="w-full" :disabled="isForce" @change="productChange">
           <el-option v-for="n in productList" :key="n.id" :value="n.id" :label="n.name" />
@@ -37,7 +42,7 @@
         <el-checkbox-group v-if="processList?.length" v-model="model.procedureList">
           <el-checkbox v-for="n in processList" :key="n.id" :label="n.id" :disabled="isForce">{{ n.name }}</el-checkbox>
         </el-checkbox-group>
-        <span v-else>请先选择生产产品</span>
+        <span v-else>请先选择产品类别</span>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="model.remark" type="textarea" :rows="3" resize="none" />
@@ -56,6 +61,7 @@
 import config from './config'
 import { getProductList } from '@/api/product'
 import { createWorkOrder, updateWorkOrder, forceUpdateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
+import { getCategoryList } from '@/api/category'
 
 export default {
   name: 'CreateWorkOrder',
@@ -68,6 +74,7 @@ export default {
         name: '',
         grade: 'middle',
         type: 'produce',
+        productCategoryId: '',
         productInfoId: '',
         count: 1,
         execDate: '',
@@ -80,15 +87,18 @@ export default {
         name: [{ required: true, message: '请输入工单名称', trigger: ['blur', 'change'] }],
         grade: [{ required: true, message: '请选择工单级别', trigger: ['change'] }],
         type: [{ required: true, message: '请选择工单类型', trigger: ['change'] }],
+        productCategoryId: [{ required: true, message: '请选择产品类别', trigger: ['change'] }],
         productInfoId: [{ required: true, message: '请选择生产产品', trigger: ['change'] }],
         count: [{ required: true, message: '请输入生产数量', trigger: ['blur', 'change'] }],
         execDate: [{ required: true, message: '请选择执行日期', trigger: ['change'] }],
         needDate: [{ required: true, message: '请选择需求日期', trigger: ['change'] }],
         procedureList: [{ required: true, type: 'array', min: 1, message: '请选择关联工序', trigger: ['change'] }]
       },
+      productCategoryList: [],
       productList: [],
       processList: [],
-      config
+      config,
+      isForce: false
     }
   },
   created() {},
@@ -98,8 +108,19 @@ export default {
         return res.data.procedureList
       })
     },
-    getProductList() {
-      getProductList({}).then(res => {
+    async getProductCategoryList() {
+      const res = await getCategoryList({})
+      this.productCategoryList = res.data
+    },
+    getProductList(productCategoryId) {
+      this.model.productInfoId = ''
+      if (!productCategoryId) {
+        this.productList = []
+        return
+      }
+      getProductList({
+        productCategoryId
+      }).then(res => {
         this.productList = res.data
       })
     },
@@ -115,9 +136,13 @@ export default {
         this.processList = res.data
       })
     },
+    productCategoryChange(v) {
+      this.getProductList(v)
+      this.getProcessList(v)
+    },
     productChange(v) {
-      const product = this.productList.find(n => n.id === v)
-      this.getProcessList(product.productCategoryId)
+      // const product = this.productList.find(n => n.id === v)
+      // this.getProcessList(product.productCategoryId)
     },
     ok() {
       this.$refs.model.validate((valid) => {
@@ -171,6 +196,7 @@ export default {
     setDefault(procedureList) {
       this.model = {
         ...this.ins,
+        productCategoryId: this.ins.productInfo?.productCategoryId,
         procedureList: procedureList.map(n => n.workingProcedureId)
       }
       // this.model.name = this.ins.name
@@ -183,21 +209,25 @@ export default {
       // this.model.procedureList = procedureList.map(n => n.workingProcedureId)
       // this.model.remark = this.ins.remark
     },
-    open(ins, isForce) {
+    async open(ins, isForce) {
       this.ins = ins
       this.isForce = isForce
+      this.getProductCategoryList()
       if (ins) {
         this.getDetail().then(procedureList => {
           this.setDefault(procedureList)
         })
+        this.getProductList(ins?.productInfo?.productCategoryId)
         this.getProcessList(ins?.productInfo?.productCategoryId)
       }
-      this.getProductList()
       this.dialogVisible = true
     },
     close() {
       this.dialogVisible = false
       this.loading = false
+      this.productCategoryList = []
+      this.productList = []
+      this.processList = []
       this.model = this.$options.data.call(this).model
       this.$refs.model.resetFields()
     }
