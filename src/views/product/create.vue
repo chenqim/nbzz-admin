@@ -9,12 +9,28 @@
       <el-form-item label="产品编号" prop="code">
         <el-input v-model="model.code" />
       </el-form-item>
-      <el-form-item label="产品名称" prop="name">
+      <!-- <el-form-item label="产品名称" prop="name">
         <el-input v-model="model.name" />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="产品类别" prop="category">
         <el-select v-model="model.category" filterable class="w-full">
           <el-option v-for="role in categoryList" :key="role.id" :value="role.id" :label="role.name" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="产品" prop="mainName">
+        <el-select
+          v-model="model.mainName"
+          filterable
+          allow-create
+          default-first-option
+          class="w-full"
+        >
+          <el-option
+            v-for="item in productList"
+            :key="item.name"
+            :label="item.name"
+            :value="item.name"
+          />
         </el-select>
       </el-form-item>
       <el-form-item label="规格型号" prop="spec">
@@ -40,7 +56,7 @@
 </template>
 
 <script>
-import { createProduct, updateProduct } from '@/api/product'
+import { createProduct, updateProduct, getProductList } from '@/api/product'
 import { getCategoryList } from '@/api/category'
 
 export default {
@@ -52,8 +68,9 @@ export default {
       ins: null,
       model: {
         code: 'CP_' + new Date().getTime(),
-        name: '',
+        // name: '',
         category: '',
+        mainName: '',
         spec: '',
         status: 'enable',
         remark: ''
@@ -61,15 +78,22 @@ export default {
       dialogVisible: false,
       rules: {
         code: [{ required: true, message: '请输入产品编号', trigger: ['blur', 'change'] }],
-        name: [{ required: true, message: '请输入产品名称', trigger: ['blur', 'change'] }],
+        // name: [{ required: true, message: '请输入产品名称', trigger: ['blur', 'change'] }],
+        mainName: [{ required: true, message: '请输入产品', trigger: ['blur', 'change'] }],
         category: [{ required: true, message: '请选择产品类别', trigger: ['blur', 'change'] }],
         spec: [{ required: true, message: '请输入规格型号', trigger: ['blur', 'change'] }]
       },
-      categoryList: []
+      categoryList: [],
+      productList: []
     }
   },
   created() {},
   methods: {
+    getProductList() {
+      getProductList({}).then(res => {
+        this.productList = res.data
+      })
+    },
     ok() {
       this.$refs.model.validate((valid) => {
         if (valid) {
@@ -85,7 +109,7 @@ export default {
       return {
         id: this.ins ? this.ins.id : undefined,
         code: this.model.code,
-        name: this.model.name,
+        // name: this.model.name,
         productCategoryId: this.model.category,
         spec: this.model.spec,
         status: this.model.status,
@@ -122,7 +146,7 @@ export default {
     },
     setDefault() {
       this.model.code = this.ins.code
-      this.model.name = this.ins.name
+      // this.model.name = this.ins.name
       this.model.category = this.ins.productCategoryId
       this.model.spec = this.ins.spec
       this.model.status = this.ins.status
@@ -139,6 +163,7 @@ export default {
       if (ins) {
         this.setDefault()
       }
+      this.getProductList()
       this.dialogVisible = true
     },
     close() {
