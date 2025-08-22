@@ -24,8 +24,8 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
-        <el-table-column label="工单编号" prop="code" min-width="180" />
-        <el-table-column label="工单名称" prop="name" min-width="180" />
+        <el-table-column label="工单编号" prop="code" min-width="120" show-overflow-tooltip />
+        <el-table-column label="工单名称" prop="name" min-width="200" show-overflow-tooltip />
         <el-table-column label="工单级别" min-width="100">
           <template v-slot="{ row }">
             <el-tag :type="config.gradeTypeMap[row.grade]">{{ config.gradeMap[row.grade] }}</el-tag>
@@ -36,10 +36,10 @@
             <span>{{ config.typeMap[row.type] }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" />
+        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" show-overflow-tooltip />
         <el-table-column label="需求日期" prop="needDate" min-width="100" />
         <el-table-column label="生产数量" prop="count" min-width="100" />
-        <el-table-column label="备注" prop="remark" min-width="180" />
+        <el-table-column label="备注" prop="remark" min-width="180" show-overflow-tooltip />
         <el-table-column label="工单状态" min-width="100">
           <template v-slot="{ row }">
             <el-tag :type="config.statusTypeMap[row.status]">{{ config.statusMap[row.status] }}</el-tag>

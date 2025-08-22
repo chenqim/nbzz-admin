@@ -7,11 +7,11 @@
         <el-tag :type="config.gradeTypeMap[ins.grade]">{{ config.gradeMap[ins.grade] }}</el-tag>
       </el-descriptions-item>
       <el-descriptions-item label="工单类型">{{ config.typeMap[ins.type] }}</el-descriptions-item>
-      <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }} ({{ ins.productInfo?.code }})</el-descriptions-item>
+      <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }} [ {{ ins.productInfo?.code }} ]</el-descriptions-item>
       <el-descriptions-item label="生产数量">{{ ins.count }}</el-descriptions-item>
       <el-descriptions-item label="执行日期">{{ ins.execDate }}</el-descriptions-item>
       <el-descriptions-item label="需求日期">{{ ins.needDate }}</el-descriptions-item>
-      <el-descriptions-item label="备注">{{ ins.remark }}</el-descriptions-item>
+      <el-descriptions-item label="备注">{{ ins.remark || '-' }}</el-descriptions-item>
       <el-descriptions-item label="工单状态">
         <el-tag :type="config.statusTypeMap[ins.status]">{{ config.statusMap[ins.status] }}</el-tag>
       </el-descriptions-item>
@@ -102,5 +102,9 @@ export default {
     font-weight: bold;
     margin-bottom: 8px;
   }
+}
+:deep(.el-descriptions-item__content) {
+  height: 50px; /* 设置你希望的高度 */
+  line-height: 50px; /* 如果需要，可以设置行高使内容垂直居中 */
 }
 </style>
