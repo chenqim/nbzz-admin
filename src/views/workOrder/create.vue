@@ -15,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="工单类型" prop="type">
-        <el-select v-model="model.type" class="w-full">
+        <el-select v-model="model.type" class="w-full" :disabled="isForce">
           <el-option v-for="n in Object.keys(config.typeMap)" :key="n" :value="n" :label="config.typeMap[n]" />
         </el-select>
       </el-form-item>

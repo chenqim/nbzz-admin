@@ -1,5 +1,10 @@
 <template>
-  <div class="app-container">
+  <div v-loading="loading" class="app-container">
+    <el-button
+      class="mb-4"
+      icon="el-icon-back"
+      @click="$router.push({name: 'WorkOrderList'})"
+    >返回列表</el-button>
     <el-descriptions class="margin-top" title="工单基本信息" :column="2" border>
       <el-descriptions-item label="工单编号">{{ ins.code }}</el-descriptions-item>
       <el-descriptions-item label="工单名称">{{ ins.name }}</el-descriptions-item>
@@ -8,7 +13,7 @@
       </el-descriptions-item>
       <el-descriptions-item label="工单类型">{{ config.typeMap[ins.type] }}</el-descriptions-item>
       <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }} [ {{ ins.productInfo?.code }} ]</el-descriptions-item>
-      <el-descriptions-item label="生产数量">{{ ins.count }}</el-descriptions-item>
+      <el-descriptions-item label="完成数量 / 生产数量">{{ ins.completeCount }} / {{ ins.count }}</el-descriptions-item>
       <el-descriptions-item label="执行日期">{{ ins.execDate }}</el-descriptions-item>
       <el-descriptions-item label="需求日期">{{ ins.needDate }}</el-descriptions-item>
       <el-descriptions-item label="备注">{{ ins.remark || '-' }}</el-descriptions-item>
@@ -48,6 +53,7 @@ export default {
   name: 'WorkOrderDetail',
   data() {
     return {
+      loading: false,
       ins: {},
       customColors: [
         { color: '#f56c6c', percentage: 20 },
@@ -63,11 +69,13 @@ export default {
   },
   methods: {
     getDetail() {
+      this.loading = true
       getWorkOrderDetail({
         id: this.$route.params.id
       }).then(res => {
         this.ins = res.data
         console.log(res.data)
+        this.loading = false
       })
     }
   }

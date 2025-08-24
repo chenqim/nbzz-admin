@@ -4,17 +4,49 @@
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="工单名称">
-          <el-input v-model="queryForm.name" />
+          <el-input v-model="queryForm.name" class="w-64" clearable />
         </el-form-item>
         <el-form-item label="工单级别">
           <el-select v-model="queryForm.grade" clearable>
             <el-option v-for="n in Object.keys(config.gradeMap)" :key="n" :value="n" :label="config.gradeMap[n]" />
           </el-select>
         </el-form-item>
+        <el-form-item label="工单类型">
+          <el-select v-model="queryForm.type" clearable>
+            <el-option v-for="n in Object.keys(config.typeMap)" :key="n" :value="n" :label="config.typeMap[n]" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="工单状态">
           <el-select v-model="queryForm.status" clearable>
             <el-option v-for="n in Object.keys(config.statusMap)" :key="n" :value="n" :label="config.statusMap[n]" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="产品名称">
+          <el-input v-model="queryForm.productName" class="w-64" clearable />
+        </el-form-item>
+        <el-form-item label="需求日期">
+          <el-date-picker
+            v-model="queryForm.needDate"
+            type="daterange"
+            align="right"
+            unlink-panels
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerOptions"
+          />
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker
+            v-model="queryForm.createTime"
+            type="daterange"
+            align="right"
+            unlink-panels
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerOptions"
+          />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" @click="query">查询</el-button>
@@ -24,29 +56,39 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
-        <el-table-column label="工单编号" prop="code" min-width="120" show-overflow-tooltip />
-        <el-table-column label="工单名称" prop="name" min-width="200" show-overflow-tooltip />
-        <el-table-column label="工单级别" min-width="100">
+        <!-- <el-table-column label="工单编号" prop="code" min-width="120" show-overflow-tooltip /> -->
+        <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
+          <template v-slot="{ row }">
+            <span>{{ row.code }}</span>
+            <br>
+            <span>{{ row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="工单级别" min-width="90">
           <template v-slot="{ row }">
             <el-tag :type="config.gradeTypeMap[row.grade]">{{ config.gradeMap[row.grade] }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="工单类型" min-width="100">
+        <el-table-column label="工单类型" min-width="90">
           <template v-slot="{ row }">
             <span>{{ config.typeMap[row.type] }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" show-overflow-tooltip />
-        <el-table-column label="需求日期" prop="needDate" min-width="100" />
-        <el-table-column label="生产数量" prop="count" min-width="100" />
-        <el-table-column label="备注" prop="remark" min-width="180" show-overflow-tooltip />
-        <el-table-column label="工单状态" min-width="100">
+        <el-table-column label="工单状态" min-width="90">
           <template v-slot="{ row }">
             <el-tag :type="config.statusTypeMap[row.status]">{{ config.statusMap[row.status] }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" prop="createTime" min-width="180" />
-        <el-table-column label="更新时间" prop="updateTime" min-width="180" />
+        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" show-overflow-tooltip />
+        <el-table-column label="完成数量 / 生产数量" min-width="140">
+          <template v-slot="{ row }">
+            <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="需求日期" prop="needDate" min-width="90" />
+        <el-table-column label="备注" prop="remark" min-width="150" show-overflow-tooltip />
+        <el-table-column label="创建时间" prop="createTime" min-width="150" />
+        <el-table-column label="更新时间" prop="updateTime" min-width="150" />
         <el-table-column label="操作" width="180" fixed="right">
           <template v-slot="{ row }">
             <el-button type="text" @click="detail(row)">详情</el-button>
@@ -90,7 +132,11 @@ export default {
       queryForm: {
         name: '',
         grade: '',
-        status: ''
+        type: '',
+        status: '',
+        productName: '',
+        needDate: [],
+        createTime: []
       },
       loading: false,
       tableData: [],
@@ -99,7 +145,35 @@ export default {
         size: 10,
         total: 0
       },
-      config
+      config,
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }]
+      },
+      p: {}
     }
   },
   computed: {
@@ -109,27 +183,50 @@ export default {
     }
   },
   created() {
+    console.log('created')
     this.getList()
     console.log(this.roles)
   },
   methods: {
+    // 缓存查询条件,详情页返回时使用
+    handleCacheQueryParams() {
+      const sp = sessionStorage.getItem('p')
+      if (sp) {
+        const p = JSON.parse(sp)
+        this.pageConfig.page = p.pageParam.page || 1
+        this.pageConfig.size = p.pageParam.size || 10
+        this.queryForm.name = p.queryParam.name || ''
+        this.queryForm.grade = p.queryParam.grade || ''
+        this.queryForm.type = p.queryParam.type || ''
+        this.queryForm.status = p.queryParam.status || ''
+        this.queryForm.productName = p.queryParam.productInfoName || ''
+        this.queryForm.needDate = p.queryParam.needDate || []
+        this.queryForm.createTime = p.queryParam.createTime || []
+      }
+    },
     getList() {
+      this.handleCacheQueryParams()
       this.loading = true
-      getWorkOrderPage({
+      const p = {
         queryParam: {
           name: this.queryForm.name || undefined,
           grade: this.queryForm.grade || undefined,
-          status: this.queryForm.status || undefined
+          type: this.queryForm.type || undefined,
+          status: this.queryForm.status || undefined,
+          productInfoName: this.queryForm.productName || undefined
         },
         pageParam: {
           page: this.pageConfig.page,
           size: this.pageConfig.size
         }
-      }).then(res => {
+      }
+      this.p = p
+      getWorkOrderPage(p).then(res => {
         console.log(res)
         this.tableData = res.data.records
         this.pageConfig.total = res.data.total
         this.loading = false
+        sessionStorage.clear()
       })
     },
     query() {
@@ -140,7 +237,11 @@ export default {
       this.queryForm = {
         name: '',
         grade: '',
-        status: ''
+        type: '',
+        status: '',
+        productName: '',
+        needDate: [],
+        createTime: []
       }
       this.pageConfig.page = 1
       this.getList()
@@ -192,6 +293,8 @@ export default {
       }
     },
     detail(row) {
+      // 缓存查询条件
+      sessionStorage.setItem('p', JSON.stringify(this.p))
       this.$router.push({
         name: 'WorkOrderDetail',
         params: {
