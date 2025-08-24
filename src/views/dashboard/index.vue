@@ -43,13 +43,13 @@
     <div class="search-panel">
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="工单编号">
-          <el-input v-model="queryForm.no" />
+          <el-input v-model="queryForm.no" placeholder="请输入工单编号进行模糊查询" clearable class="w-64" />
         </el-form-item>
         <el-form-item label="工单名称">
-          <el-input v-model="queryForm.name" />
+          <el-input v-model="queryForm.name" placeholder="请输入工单名称进行模糊查询" clearable class="w-64" />
         </el-form-item>
         <el-form-item label="产品名称">
-          <el-input v-model="queryForm.product" />
+          <el-input v-model="queryForm.product" placeholder="请输入产品名称进行模糊查询" clearable class="w-64" />
         </el-form-item>
         <!-- <el-form-item label="工单级别">
           <el-select v-model="queryForm.grade" clearable>
@@ -69,8 +69,15 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
-        <el-table-column label="工单编号" prop="code" min-width="180" />
-        <el-table-column label="工单名称" prop="name" min-width="180" />
+        <!-- <el-table-column label="工单编号" prop="code" min-width="180" />
+        <el-table-column label="工单名称" prop="name" min-width="180" /> -->
+        <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
+          <template v-slot="{ row }">
+            <span>{{ row.code }}</span>
+            <br>
+            <span>{{ row.name }}</span>
+          </template>
+        </el-table-column>
         <!-- <el-table-column label="工单级别" min-width="100">
           <template v-slot="{ row }">
             <el-tag :type="config.gradeTypeMap[row.grade]">{{ config.gradeMap[row.grade] }}</el-tag>
@@ -83,7 +90,11 @@
         </el-table-column> -->
         <el-table-column label="产品名称" prop="productInfo.name" min-width="180" />
         <el-table-column label="需求日期" prop="needDate" min-width="180" />
-        <el-table-column label="工单数量" prop="count" min-width="180" />
+        <el-table-column label="完成数量 / 生产数量" min-width="140">
+          <template v-slot="{ row }">
+            <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
+          </template>
+        </el-table-column>
         <!-- <el-table-column label="备注" prop="remark" min-width="180" />
         <el-table-column label="工单状态" min-width="100">
           <template v-slot="{ row }">

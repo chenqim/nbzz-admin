@@ -4,25 +4,25 @@
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="工单名称">
-          <el-input v-model="queryForm.name" class="w-64" clearable />
+          <el-input v-model="queryForm.name" placeholder="请输入工单名称进行模糊查询" class="w-64" clearable />
         </el-form-item>
         <el-form-item label="工单级别">
-          <el-select v-model="queryForm.grade" clearable>
+          <el-select v-model="queryForm.grade" placeholder="请选择工单级别" clearable>
             <el-option v-for="n in Object.keys(config.gradeMap)" :key="n" :value="n" :label="config.gradeMap[n]" />
           </el-select>
         </el-form-item>
         <el-form-item label="工单类型">
-          <el-select v-model="queryForm.type" clearable>
+          <el-select v-model="queryForm.type" placeholder="请选择工单类型" clearable>
             <el-option v-for="n in Object.keys(config.typeMap)" :key="n" :value="n" :label="config.typeMap[n]" />
           </el-select>
         </el-form-item>
         <el-form-item label="工单状态">
-          <el-select v-model="queryForm.status" clearable>
+          <el-select v-model="queryForm.status" placeholder="请选择工单状态" clearable>
             <el-option v-for="n in Object.keys(config.statusMap)" :key="n" :value="n" :label="config.statusMap[n]" />
           </el-select>
         </el-form-item>
         <el-form-item label="产品名称">
-          <el-input v-model="queryForm.productName" class="w-64" clearable />
+          <el-input v-model="queryForm.productName" placeholder="请输入产品名称进行模糊查询" class="w-64" clearable />
         </el-form-item>
         <el-form-item label="需求日期">
           <el-date-picker
@@ -34,6 +34,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             :picker-options="pickerOptions"
+            value-format="yyyy-MM-dd"
           />
         </el-form-item>
         <el-form-item label="创建时间">
@@ -46,6 +47,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             :picker-options="pickerOptions"
+            value-format="yyyy-MM-dd"
           />
         </el-form-item>
         <el-form-item>
@@ -200,8 +202,8 @@ export default {
         this.queryForm.type = p.queryParam.type || ''
         this.queryForm.status = p.queryParam.status || ''
         this.queryForm.productName = p.queryParam.productInfoName || ''
-        this.queryForm.needDate = p.queryParam.needDate || []
-        this.queryForm.createTime = p.queryParam.createTime || []
+        this.queryForm.needDate = p.queryParam.needDateStart ? [p.queryParam.needDateStart, p.queryParam.needDateEnd] : []
+        this.queryForm.createTime = p.queryParam.createTimeStart ? [p.queryParam.createTimeStart, p.queryParam.createTimeEnd] : []
       }
     },
     getList() {
@@ -213,7 +215,11 @@ export default {
           grade: this.queryForm.grade || undefined,
           type: this.queryForm.type || undefined,
           status: this.queryForm.status || undefined,
-          productInfoName: this.queryForm.productName || undefined
+          productInfoName: this.queryForm.productName || undefined,
+          needDateStart: this.queryForm.needDate?.[0] || undefined,
+          needDateEnd: this.queryForm.needDate?.[1] || undefined,
+          createTimeStart: this.queryForm.createTime?.[0] || undefined,
+          createTimeEnd: this.queryForm.createTime?.[1] || undefined
         },
         pageParam: {
           page: this.pageConfig.page,
