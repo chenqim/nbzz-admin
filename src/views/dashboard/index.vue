@@ -10,28 +10,28 @@
           @change="getAllData"
         />
       </div>
-      <h1 class="title">需求达成率总览</h1>
+      <h1 class="title">工单执行总览</h1>
       <div v-loading="topLoading" class="flex" style="gap: 16px;">
-        <el-card v-for="n in list" :key="n.label" class="w-1/5">
+        <el-card v-for="n in list2" :key="n.label" class="w-1/5">
           <div class="flex">
-            <div class="w-1/2">
+            <div>
               <i class="fz-60 icon-color" :class="n.class" />
             </div>
-            <div class="w-1/2 pr-4">
+            <div class="flex-1 pr-4">
               <div class="label">{{ n.label }}</div>
               <div class="value">{{ n.value }}</div>
             </div>
           </div>
         </el-card>
       </div>
-      <h1 class="title mt-4">工单执行总览</h1>
+      <h1 class="title mt-4">需求达成率总览</h1>
       <div v-loading="topLoading" class="flex" style="gap: 16px;">
-        <el-card v-for="n in list2" :key="n.label" class="w-1/5">
+        <el-card v-for="n in list" :key="n.label" class="w-1/5">
           <div class="flex">
-            <div class="w-1/2">
+            <div>
               <i class="fz-60 icon-color" :class="n.class" />
             </div>
-            <div class="w-1/2 pr-4">
+            <div class="flex-1 pr-4">
               <div class="label">{{ n.label }}</div>
               <div class="value">{{ n.value }}</div>
             </div>
@@ -89,7 +89,11 @@
           </template>
         </el-table-column> -->
         <el-table-column label="产品名称" prop="productInfo.name" min-width="180" />
-        <el-table-column label="需求日期" prop="needDate" min-width="180" />
+        <el-table-column label="需求日期" prop="needDate" min-width="180">
+          <template v-slot="{ row }">
+            <span style="color: red;font-weight: bold;">{{ row.needDate }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="完成数量 / 生产数量" min-width="140">
           <template v-slot="{ row }">
             <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
@@ -199,11 +203,11 @@ export default {
         }).then(res => {
           const { totalOrderCount, completedOrderCount, executedOrderCount, processOrderCount, completedOrderRatio } = res.data
           this.list = [
-            { label: '总需求', value: totalOrderCount, class: 'el-icon-s-platform' },
-            { label: '已发货', value: completedOrderCount, class: 'el-icon-s-promotion' },
-            { label: '待发货', value: executedOrderCount, class: 'el-icon-s-goods' },
-            { label: '未完成', value: processOrderCount, class: 'el-icon-s-release' },
-            { label: '需求达成率', value: completedOrderRatio + '%', class: 'el-icon-s-flag' }
+            { label: '今日总工单数', value: totalOrderCount, class: 'el-icon-s-platform' },
+            { label: '今日已发货', value: completedOrderCount, class: 'el-icon-s-promotion' },
+            { label: '今日待发货', value: executedOrderCount, class: 'el-icon-s-goods' },
+            { label: '今日未完成', value: processOrderCount, class: 'el-icon-s-release' },
+            { label: '今日需求达成率', value: completedOrderRatio + '%', class: 'el-icon-s-flag' }
           ]
         }),
         queryProduceExecuteTotal({
@@ -211,11 +215,11 @@ export default {
         }).then(res => {
           const { totalWorkerCount, totalArtifactCount, totalOrderCount, successArtifactCount, successOrderCount } = res.data
           this.list2 = [
-            { label: '生产人数', value: totalWorkerCount, class: 'el-icon-s-custom' },
-            { label: '在制产品数', value: totalArtifactCount, class: 'el-icon-s-shop' },
-            { label: '在制工单数', value: totalOrderCount, class: 'el-icon-s-order' },
-            { label: '完工产品数', value: successArtifactCount, class: 'el-icon-s-claim' },
-            { label: '完工工单数', value: successOrderCount, class: 'el-icon-s-claim' }
+            { label: '今日在制工单数 >', value: totalOrderCount, class: 'el-icon-s-order' },
+            { label: '今日完工工单数 >', value: successOrderCount, class: 'el-icon-s-claim' },
+            { label: '今日生产人数', value: totalWorkerCount, class: 'el-icon-s-custom' },
+            { label: '今日在制产品数', value: totalArtifactCount, class: 'el-icon-s-shop' },
+            { label: '今日完工产品数', value: successArtifactCount, class: 'el-icon-s-claim' }
           ]
         })
       ]).then(() => {
