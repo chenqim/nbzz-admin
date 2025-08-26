@@ -12,7 +12,7 @@
       </div>
       <h1 class="title">工单执行总览</h1>
       <div v-loading="topLoading" class="flex" style="gap: 16px;">
-        <el-card v-for="n in list2" :key="n.label" class="w-1/5">
+        <el-card v-for="n in list2" :key="n.label" class="w-1/5" :class="n.id ? 'cursor-pointer' : ''" @click.native="openWorkOrderModal(n)">
           <div class="flex">
             <div>
               <i class="fz-60 icon-color" :class="n.class" />
@@ -26,7 +26,7 @@
       </div>
       <h1 class="title mt-4">需求达成率总览</h1>
       <div v-loading="topLoading" class="flex" style="gap: 16px;">
-        <el-card v-for="n in list" :key="n.label" class="w-1/5">
+        <el-card v-for="n in list" :key="n.label" class="w-1/5" :class="n.id ? 'cursor-pointer' : ''" @click.native="openWorkOrderModal(n)">
           <div class="flex">
             <div>
               <i class="fz-60 icon-color" :class="n.class" />
@@ -69,8 +69,6 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
-        <!-- <el-table-column label="工单编号" prop="code" min-width="180" />
-        <el-table-column label="工单名称" prop="name" min-width="180" /> -->
         <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
           <template v-slot="{ row }">
             <span>{{ row.code }}</span>
@@ -78,16 +76,6 @@
             <span>{{ row.name }}</span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="工单级别" min-width="100">
-          <template v-slot="{ row }">
-            <el-tag :type="config.gradeTypeMap[row.grade]">{{ config.gradeMap[row.grade] }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="工单类型" min-width="100">
-          <template v-slot="{ row }">
-            <span>{{ config.typeMap[row.type] }}</span>
-          </template>
-        </el-table-column> -->
         <el-table-column label="产品名称" prop="productInfo.name" min-width="180" />
         <el-table-column label="需求日期" prop="needDate" min-width="180">
           <template v-slot="{ row }">
@@ -99,14 +87,6 @@
             <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="备注" prop="remark" min-width="180" />
-        <el-table-column label="工单状态" min-width="100">
-          <template v-slot="{ row }">
-            <el-tag :type="config.statusTypeMap[row.status]">{{ config.statusMap[row.status] }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="创建时间" prop="createTime" min-width="180" />
-        <el-table-column label="更新时间" prop="updateTime" min-width="180" /> -->
         <el-table-column label="工单进度" prop="a" min-width="180">
           <template v-slot="{ row }">
             <span>{{ Number((row.completeCount / row.count).toFixed(2)) * 100 }}%</span>
@@ -150,6 +130,54 @@
         <el-button @click="cancel">关闭</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      :title="titleMap[workOrderTitle]"
+      :visible.sync="workOrderShow"
+      width="80%"
+    >
+      <el-table v-loading="loading" :data="tableData">
+        <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
+          <template v-slot="{ row }">
+            <span>{{ row.code }}</span>
+            <br>
+            <span>{{ row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="工单级别" min-width="90">
+          <template v-slot="{ row }">
+            <el-tag :type="config.gradeTypeMap[row.grade]">{{ config.gradeMap[row.grade] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="工单类型" min-width="90">
+          <template v-slot="{ row }">
+            <span>{{ config.typeMap[row.type] }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="工单状态" min-width="90">
+          <template v-slot="{ row }">
+            <el-tag :type="config.statusTypeMap[row.status]">{{ config.statusMap[row.status] }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" show-overflow-tooltip />
+        <el-table-column label="完成数量 / 生产数量" min-width="140">
+          <template v-slot="{ row }">
+            <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="需求日期" min-width="90">
+          <template v-slot="{ row }">
+            <span style="color: red;font-weight: bold;">{{ row.needDate }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="备注" prop="remark" min-width="150" show-overflow-tooltip />
+        <el-table-column label="创建时间" prop="createTime" min-width="150" />
+        <!-- <el-table-column label="更新时间" prop="updateTime" min-width="150" /> -->
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="workOrderShow = false">取 消</el-button>
+        <el-button type="primary" @click="workOrderShow = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -187,7 +215,17 @@ export default {
         { color: '#e6a23c', percentage: 50 },
         { color: '#409eff', percentage: 99 },
         { color: '#67c23a', percentage: 100 }
-      ]
+      ],
+      workOrderShow: false,
+      workOrderTitle: '',
+      titleMap: {
+        circle: '今日在制工单数',
+        finsh: '今日完工工单数',
+        total: '今日总工单数',
+        delivered: '今日已发货',
+        pendingDelivered: '今日待发货',
+        notFinsh: '今日未完成'
+      }
     }
   },
   created() {
@@ -203,10 +241,10 @@ export default {
         }).then(res => {
           const { totalOrderCount, completedOrderCount, executedOrderCount, processOrderCount, completedOrderRatio } = res.data
           this.list = [
-            { label: '今日总工单数', value: totalOrderCount, class: 'el-icon-s-platform' },
-            { label: '今日已发货', value: completedOrderCount, class: 'el-icon-s-promotion' },
-            { label: '今日待发货', value: executedOrderCount, class: 'el-icon-s-goods' },
-            { label: '今日未完成', value: processOrderCount, class: 'el-icon-s-release' },
+            { label: '今日总工单数 >', value: totalOrderCount, id: 'circle', class: 'el-icon-s-platform' },
+            { label: '今日已发货 >', value: completedOrderCount, id: 'delivered', class: 'el-icon-s-promotion' },
+            { label: '今日待发货 >', value: executedOrderCount, id: 'pendingDelivered', class: 'el-icon-s-goods' },
+            { label: '今日未完成 >', value: processOrderCount, id: 'notFinsh', class: 'el-icon-s-release' },
             { label: '今日需求达成率', value: completedOrderRatio + '%', class: 'el-icon-s-flag' }
           ]
         }),
@@ -215,8 +253,8 @@ export default {
         }).then(res => {
           const { totalWorkerCount, totalArtifactCount, totalOrderCount, successArtifactCount, successOrderCount } = res.data
           this.list2 = [
-            { label: '今日在制工单数 >', value: totalOrderCount, class: 'el-icon-s-order' },
-            { label: '今日完工工单数 >', value: successOrderCount, class: 'el-icon-s-claim' },
+            { label: '今日在制工单数 >', value: totalOrderCount, id: 'circle', class: 'el-icon-s-order' },
+            { label: '今日完工工单数 >', value: successOrderCount, id: 'finsh', class: 'el-icon-s-claim' },
             { label: '今日生产人数', value: totalWorkerCount, class: 'el-icon-s-custom' },
             { label: '今日在制产品数', value: totalArtifactCount, class: 'el-icon-s-shop' },
             { label: '今日完工产品数', value: successArtifactCount, class: 'el-icon-s-claim' }
@@ -291,6 +329,12 @@ export default {
     pageChange(v) {
       this.pageConfig.page = v
       this.getList()
+    },
+    openWorkOrderModal(n) {
+      if (n.id) {
+        this.workOrderShow = true
+        this.workOrderTitle = n.id
+      }
     }
   }
 }
