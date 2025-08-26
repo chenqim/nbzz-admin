@@ -136,6 +136,8 @@
       width="80%"
     >
       <el-table v-loading="loading" :data="tableData">
+        <el-table-column type="index" label="序号" width="60" align="center" />
+
         <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
           <template v-slot="{ row }">
             <span>{{ row.code }}</span>
@@ -241,7 +243,7 @@ export default {
         }).then(res => {
           const { totalOrderCount, completedOrderCount, executedOrderCount, processOrderCount, completedOrderRatio } = res.data
           this.list = [
-            { label: '今日总工单数 >', value: totalOrderCount, id: 'circle', class: 'el-icon-s-platform' },
+            { label: '今日总工单数 >', value: totalOrderCount, id: 'total', class: 'el-icon-s-platform' },
             { label: '今日已发货 >', value: completedOrderCount, id: 'delivered', class: 'el-icon-s-promotion' },
             { label: '今日待发货 >', value: executedOrderCount, id: 'pendingDelivered', class: 'el-icon-s-goods' },
             { label: '今日未完成 >', value: processOrderCount, id: 'notFinsh', class: 'el-icon-s-release' },
