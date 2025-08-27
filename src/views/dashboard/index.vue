@@ -135,9 +135,8 @@
       :visible.sync="workOrderShow"
       width="80%"
     >
-      <el-table v-loading="loading" :data="tableData">
+      <el-table v-loading="dialogTableLoading" height="478px" :data="dialogTableData">
         <el-table-column type="index" label="序号" width="60" align="center" />
-
         <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
           <template v-slot="{ row }">
             <span>{{ row.code }}</span>
@@ -186,7 +185,7 @@
 <script>
 import dayjs from 'dayjs'
 import config from '../workOrder/config.js'
-import { queryLatelyByPage, queryOrderAchieveTotal, queryProduceExecuteTotal, getWorkOrderDetail } from '@/api/workOrder'
+import { queryLatelyByPage, queryOrderAchieveTotal, queryProduceExecuteTotal, getWorkOrderDetail, queryTotalOrderList } from '@/api/workOrder'
 
 export default {
   name: 'Dashboard',
@@ -227,7 +226,17 @@ export default {
         delivered: '今日已发货',
         pendingDelivered: '今日待发货',
         notFinsh: '今日未完成'
-      }
+      },
+      paramMap: {
+        circle: 'artifactOrderCount',
+        finsh: 'successOrderCount',
+        total: 'totalOrderCount',
+        delivered: 'completedOrderCount',
+        pendingDelivered: 'executedOrderCount',
+        notFinsh: 'processOrderCount'
+      },
+      dialogTableLoading: false,
+      dialogTableData: []
     }
   },
   created() {
@@ -336,6 +345,14 @@ export default {
       if (n.id) {
         this.workOrderShow = true
         this.workOrderTitle = n.id
+        this.dialogTableLoading = true
+        queryTotalOrderList({
+          byType: this.paramMap[this.workOrderTitle],
+          targetDate: this.dateValue
+        }).then(res => {
+          this.dialogTableData = res.data
+          this.dialogTableLoading = false
+        })
       }
     }
   }

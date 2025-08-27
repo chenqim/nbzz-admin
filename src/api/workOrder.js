@@ -103,3 +103,11 @@ export function updateWorkingProcedure(data) {
     data
   })
 }
+
+export function queryTotalOrderList(data) {
+  return request({
+    url: '/wxapp/boss/queryTotalOrderList',
+    method: 'post',
+    data
+  })
+}
