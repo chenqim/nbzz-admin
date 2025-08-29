@@ -144,7 +144,7 @@ export default {
       tableData: [],
       pageConfig: {
         page: 1,
-        size: 10,
+        size: 20,
         total: 0
       },
       config,
@@ -196,7 +196,7 @@ export default {
       if (sp) {
         const p = JSON.parse(sp)
         this.pageConfig.page = p.pageParam.page || 1
-        this.pageConfig.size = p.pageParam.size || 10
+        this.pageConfig.size = p.pageParam.size || 20
         this.queryForm.name = p.queryParam.name || ''
         this.queryForm.grade = p.queryParam.grade || ''
         this.queryForm.type = p.queryParam.type || ''

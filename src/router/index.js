@@ -65,7 +65,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/production/list',
     name: 'Production',
-    meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli', roles: ['Admin', 'Boss', 'Leader'] },
+    meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli', roles: ['Admin', 'Boss', 'Leader', 'Clerk'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -78,7 +78,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'WorkOrderList',
             component: () => import('@/views/workOrder/list'),
-            meta: { title: '工单管理', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss', 'Leader'] }
+            meta: { title: '工单管理', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss', 'Leader', 'Clerk'] }
           },
           {
             path: 'detail/:id',
@@ -88,7 +88,7 @@ export const asyncRoutes = [
             meta: {
               title: '工单详情',
               activeMenu: '/production/workOrder/list',
-              roles: ['Admin', 'Boss', 'Leader']
+              roles: ['Admin', 'Boss', 'Leader', 'Clerk']
             }
           }
         ]
@@ -114,7 +114,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/factory/product',
     name: 'Factory',
-    meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo', roles: ['Admin', 'Boss'] },
+    meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo', roles: ['Admin', 'Boss', 'Clerk'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -139,7 +139,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'ProductList',
             component: () => import('@/views/product/list'),
-            meta: { title: '产品管理', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss'] }
+            meta: { title: '产品管理', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss', 'Clerk'] }
           }
         ]
       },
