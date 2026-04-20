@@ -91,12 +91,13 @@
         <el-table-column label="备注" prop="remark" min-width="150" show-overflow-tooltip />
         <el-table-column label="创建时间" prop="createTime" min-width="150" />
         <el-table-column label="更新时间" prop="updateTime" min-width="150" />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template v-slot="{ row }">
             <el-button type="text" @click="detail(row)">详情</el-button>
             <el-button type="text" :disabled="row.status !== 'create'" @click="update(row)">修改</el-button>
             <el-button type="text" :disabled="row.status !== 'create'" @click="del(row)">删除</el-button>
             <el-button type="text" :disabled="row.status !== 'executed'" @click="send(row)">发货</el-button>
+            <el-button type="text" @click="printWorkOrder(row)">打印</el-button>
             <div v-if="hasPermission">
               <el-button type="text" @click="update(row, true)">强制修改</el-button>
               <el-button type="text" @click="del(row, true)">强制删除</el-button>
@@ -307,6 +308,136 @@ export default {
           id: row.id
         }
       })
+    },
+    printWorkOrder(row) {
+      const printWindow = window.open('', '_blank')
+      if (!printWindow) {
+        this.$message.warning('请允许浏览器弹窗后再重试打印')
+        return
+      }
+      const fields = this.buildPrintFields(row)
+      const html = `
+        <!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>工单打印</title>
+            <style>
+              * { box-sizing: border-box; }
+              @page { size: A6 portrait; margin: 6mm; }
+              html, body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+                color: #303133;
+                font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+              }
+              .print-sheet {
+                width: 100%;
+                border: 1px solid #ebeef5;
+                border-radius: 4px;
+                overflow: hidden;
+              }
+              .print-row {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                min-height: 28px;
+                padding: 8px 10px;
+                border-bottom: 1px solid #ebeef5;
+                font-size: 12px;
+                line-height: 1.4;
+              }
+              .print-row:last-child { border-bottom: none; }
+              .print-label {
+                color: #303133;
+                margin-right: 8px;
+                white-space: nowrap;
+              }
+              .print-value {
+                color: #909399;
+                text-align: right;
+                margin-left: 10px;
+                word-break: break-all;
+              }
+              .tag {
+                display: inline-block;
+                border-radius: 3px;
+                padding: 1px 6px;
+                color: #fff;
+                font-size: 11px;
+                line-height: 16px;
+              }
+              .tag-primary { background: #409eff; }
+              .tag-danger { background: #f56c6c; }
+              .tag-warning { background: #e6a23c; }
+              .tag-info {
+                color: #409eff;
+                background: #ecf5ff;
+                border: 1px solid #b3d8ff;
+              }
+              @media print {
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="print-sheet">
+              ${fields.map(field => `
+                <div class="print-row">
+                  <span class="print-label">${field.label}</span>
+                  <span class="print-value">${field.value}</span>
+                </div>
+              `).join('')}
+            </div>
+          </body>
+        </html>
+      `
+      printWindow.document.open()
+      printWindow.document.write(html)
+      printWindow.document.close()
+      printWindow.focus()
+      setTimeout(() => {
+        printWindow.print()
+        printWindow.close()
+      }, 300)
+    },
+    buildPrintFields(row) {
+      const safeText = (value) => {
+        const text = value === null || value === undefined || value === '' ? '-' : String(value)
+        return text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+      }
+      const gradeTypeMap = {
+        primary: 'tag-primary',
+        danger: 'tag-danger'
+      }
+      const statusTypeMap = {
+        warning: 'tag-warning',
+        info: 'tag-info',
+        primary: 'tag-primary',
+        danger: 'tag-danger'
+      }
+      const gradeType = gradeTypeMap[this.config.gradeTypeMap[row.grade]] || 'tag-primary'
+      const statusType = statusTypeMap[this.config.statusTypeMap[row.status]] || 'tag-primary'
+      const spec = row.productInfo?.specification || row.productInfo?.spec || row.productInfo?.model || row.productInfo?.code || '-'
+      return [
+        { label: '工单编号', value: safeText(row.code) },
+        { label: '工单名称', value: safeText(row.name) },
+        { label: '工单级别', value: `<span class="tag ${gradeType}">${safeText(this.config.gradeMap[row.grade] || '-')}</span>` },
+        { label: '工单类型', value: `<span class="tag tag-danger">${safeText(this.config.typeMap[row.type] || '-')}</span>` },
+        { label: '产品名称', value: safeText(row.productInfo?.name) },
+        { label: '规格型号', value: safeText(spec) },
+        { label: '完成数量 / 生产数量', value: safeText(`${row.completeCount || 0} / ${row.count || 0}`) },
+        { label: '生产状态', value: `<span class="tag ${statusType}">${safeText(this.config.statusMap[row.status] || '-')}</span>` },
+        { label: '截止时间', value: safeText(row.needDate) },
+        { label: '备注', value: safeText(row.remark) }
+      ]
     },
     sizeChange(v) {
       this.pageConfig.size = v
