@@ -122,7 +122,7 @@
         <div v-for="p in ins.procedureList" :key="p.id" class="mb-4">
           <div class="head">{{ p.workingProcedure.name }} [ {{ p.workingProcedure.code }} ]</div>
           <div>
-            <el-progress :stroke-width="12" :color="customColors" :percentage="Number(((p.completeCount / p.count) * 100).toFixed(0))" />
+            <el-progress :stroke-width="12" :color="customColors" :percentage="p.count === 0 ? 0 : Number(((p.completeCount / p.count) * 100).toFixed(0))" />
           </div>
         </div>
       </div>

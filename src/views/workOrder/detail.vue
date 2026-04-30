@@ -39,7 +39,7 @@
         <span class="value">{{ p.completeCount }} / {{ p.count }}</span>
       </div>
       <div>
-        <el-progress class="w-1/4" :stroke-width="12" :color="customColors" :percentage="Number(((p.completeCount / p.count) * 100).toFixed(0))" />
+        <el-progress class="w-1/4" :stroke-width="12" :color="customColors" :percentage="p.count === 0 ? 0 : Number(((p.completeCount / p.count) * 100).toFixed(0))" />
       </div>
     </div>
   </div>
