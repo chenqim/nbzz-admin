@@ -3,6 +3,9 @@
     <div class="search-panel">
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
       <el-form inline :model="queryForm" class="mt-4">
+        <el-form-item label="工单编号">
+          <el-input v-model="queryForm.code" placeholder="请输入工单编号进行模糊查询" class="w-64" clearable />
+        </el-form-item>
         <el-form-item label="工单名称">
           <el-input v-model="queryForm.name" placeholder="请输入工单名称进行模糊查询" class="w-64" clearable />
         </el-form-item>
@@ -23,6 +26,11 @@
         </el-form-item>
         <el-form-item label="产品名称">
           <el-input v-model="queryForm.productName" placeholder="请输入产品名称进行模糊查询" class="w-64" clearable />
+        </el-form-item>
+        <el-form-item label="员工姓名">
+          <el-select v-model="queryForm.userAccount" placeholder="请选择员工姓名" filterable clearable>
+            <el-option v-for="n in userList" :key="n.id" :value="n.userAccount" :label="n.userName" />
+          </el-select>
         </el-form-item>
         <el-form-item label="需求日期">
           <el-date-picker
@@ -123,6 +131,7 @@
 import { mapGetters } from 'vuex'
 import config from './config'
 import { getWorkOrderPage, deleteWorkOrder, forceDeleteWorkOrder, deliveryOrder } from '@/api/workOrder'
+import { getStaffList } from '@/api/staff'
 import Create from './create'
 
 export default {
@@ -133,14 +142,17 @@ export default {
   data() {
     return {
       queryForm: {
+        code: '',
         name: '',
         grade: '',
         type: '',
         status: '',
         productName: '',
+        userAccount: '',
         needDate: [],
         createTime: []
       },
+      userList: [],
       loading: false,
       tableData: [],
       pageConfig: {
@@ -188,6 +200,7 @@ export default {
   created() {
     console.log('created')
     this.getList()
+    this.getUserList()
     console.log(this.roles)
   },
   methods: {
@@ -198,11 +211,13 @@ export default {
         const p = JSON.parse(sp)
         this.pageConfig.page = p.pageParam.page || 1
         this.pageConfig.size = p.pageParam.size || 20
+        this.queryForm.code = p.queryParam.code || ''
         this.queryForm.name = p.queryParam.name || ''
         this.queryForm.grade = p.queryParam.grade || ''
         this.queryForm.type = p.queryParam.type || ''
         this.queryForm.status = p.queryParam.status || ''
         this.queryForm.productName = p.queryParam.productInfoName || ''
+        this.queryForm.userAccount = p.queryParam.userAccount || ''
         this.queryForm.needDate = p.queryParam.needDateStart ? [p.queryParam.needDateStart, p.queryParam.needDateEnd] : []
         this.queryForm.createTime = p.queryParam.createTimeStart ? [p.queryParam.createTimeStart, p.queryParam.createTimeEnd] : []
       }
@@ -212,11 +227,13 @@ export default {
       this.loading = true
       const p = {
         queryParam: {
+          code: this.queryForm.code || undefined,
           name: this.queryForm.name || undefined,
           grade: this.queryForm.grade || undefined,
           type: this.queryForm.type || undefined,
           status: this.queryForm.status || undefined,
           productInfoName: this.queryForm.productName || undefined,
+          userAccount: this.queryForm.userAccount || undefined,
           needDateStart: this.queryForm.needDate?.[0] || undefined,
           needDateEnd: this.queryForm.needDate?.[1] || undefined,
           createTimeStart: this.queryForm.createTime?.[0] || undefined,
@@ -236,17 +253,31 @@ export default {
         sessionStorage.clear()
       })
     },
+    getUserList() {
+      getStaffList({
+        page: 1,
+        size: 99
+      }).then(res => {
+        this.userList = res.data.records.filter(n => {
+          return !['admin', 'chenqiming', 'SunShunJie', 'WxTestUser'].includes(n.userAccount)
+        }).sort((a, b) => {
+          return a.userName.localeCompare(b.userName)
+        })
+      })
+    },
     query() {
       this.pageConfig.page = 1
       this.getList()
     },
     reset() {
       this.queryForm = {
+        code: '',
         name: '',
         grade: '',
         type: '',
         status: '',
         productName: '',
+        userAccount: '',
         needDate: [],
         createTime: []
       }

@@ -51,3 +51,11 @@ export function queryMainNameList(data) {
     data
   })
 }
+
+export function getProductDetail(data) {
+  return request({
+    url: '/productInfo/queryDetail',
+    method: 'post',
+    data
+  })
+}

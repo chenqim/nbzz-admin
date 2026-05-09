@@ -134,12 +134,24 @@ export const asyncRoutes = [
         path: 'product',
         name: 'Product',
         component: () => import('@/views/product/index'),
+        redirect: '/factory/product/list',
         children: [
           {
             path: 'list',
             name: 'ProductList',
             component: () => import('@/views/product/list'),
             meta: { title: '产品管理', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss', 'Clerk'] }
+          },
+          {
+            path: 'detail/:id',
+            name: 'ProductDetail',
+            component: () => import('@/views/product/detail'),
+            hidden: true,
+            meta: {
+              title: '产品详情',
+              activeMenu: '/factory/product/list',
+              roles: ['Admin', 'Boss', 'Clerk']
+            }
           }
         ]
       },

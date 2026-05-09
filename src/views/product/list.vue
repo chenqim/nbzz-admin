@@ -40,8 +40,9 @@
         <el-table-column label="备注" prop="remark" min-width="180" />
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template v-slot="{ row }">
+            <!-- <el-button type="text" @click="detail(row)">详情</el-button> -->
             <el-button type="text" @click="update(row)">修改</el-button>
             <el-button type="text" @click="del(row)">删除</el-button>
           </template>
@@ -148,6 +149,9 @@ export default {
     },
     create() {
       this.$refs.createRef.open()
+    },
+    detail(row) {
+      this.$router.push({ name: 'ProductDetail', params: { id: row.id }})
     },
     update(row) {
       this.$refs.createRef.open(row)
