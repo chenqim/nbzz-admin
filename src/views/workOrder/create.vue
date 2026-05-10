@@ -7,7 +7,13 @@
   >
     <el-form ref="model" :model="model" :rules="rules" label-width="100px">
       <el-form-item label="工单名称" prop="name">
-        <el-input v-model="model.name" />
+        <el-autocomplete
+          v-model="model.name"
+          class="w-full"
+          :fetch-suggestions="fetchWorkOrderNameSuggestions"
+          placeholder="请输入工单名称"
+          clearable
+        />
       </el-form-item>
       <el-form-item label="工单级别" prop="grade">
         <el-select v-model="model.grade" class="w-full">
@@ -76,7 +82,7 @@
 <script>
 import config from './config'
 import { getProductList, queryMainNameList } from '@/api/product'
-import { createWorkOrder, updateWorkOrder, forceUpdateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList } from '@/api/workOrder'
+import { createWorkOrder, updateWorkOrder, forceUpdateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList, queryWorkOrderNameList } from '@/api/workOrder'
 import { getCategoryList } from '@/api/category'
 
 export default {
@@ -122,6 +128,19 @@ export default {
   },
   created() {},
   methods: {
+    getSuggestions() {
+      queryWorkOrderNameList({}).then(res => {
+        this.suggestions = res?.data.map(n => ({ value: n })) || []
+      })
+    },
+    fetchWorkOrderNameSuggestions(queryString, cb) {
+      const q = (queryString || '').trim()
+      if (!q) {
+        cb(this.suggestions)
+        return
+      }
+      cb(this.suggestions.filter(n => n.value.toLowerCase().includes(q.toLowerCase())))
+    },
     getMainNameList(productCategoryId) {
       this.model.mainName = ''
       if (!productCategoryId) {
@@ -249,6 +268,7 @@ export default {
     async open(ins, isForce) {
       this.ins = ins
       this.isForce = isForce
+      this.getSuggestions()
       this.getProductCategoryList()
       if (ins) {
         this.getDetail().then(procedureList => {

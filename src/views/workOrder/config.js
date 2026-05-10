@@ -12,7 +12,8 @@ config.gradeTypeMap = {
 
 config.typeMap = {
   produce: '新刀',
-  maintenance: '维修'
+  maintenance: '维修',
+  rework: '返工'
 }
 
 config.statusMap = {

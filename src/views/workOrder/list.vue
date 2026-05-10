@@ -1,35 +1,96 @@
 <template>
   <div class="app-container">
     <div class="search-panel">
-      <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
+      <el-button
+        icon="el-icon-plus"
+        type="primary"
+        @click="create"
+      >创建</el-button>
+      <el-button
+        icon="el-icon-download"
+        :loading="exporting"
+        @click="exportExcel"
+      >导出</el-button>
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="工单编号">
-          <el-input v-model="queryForm.code" placeholder="请输入工单编号进行模糊查询" class="w-64" clearable />
+          <el-input
+            v-model="queryForm.code"
+            placeholder="请输入工单编号进行模糊查询"
+            class="w-64"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="工单名称">
-          <el-input v-model="queryForm.name" placeholder="请输入工单名称进行模糊查询" class="w-64" clearable />
+          <el-input
+            v-model="queryForm.name"
+            placeholder="请输入工单名称进行模糊查询"
+            class="w-64"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="工单级别">
-          <el-select v-model="queryForm.grade" placeholder="请选择工单级别" clearable>
-            <el-option v-for="n in Object.keys(config.gradeMap)" :key="n" :value="n" :label="config.gradeMap[n]" />
+          <el-select
+            v-model="queryForm.grade"
+            placeholder="请选择工单级别"
+            clearable
+          >
+            <el-option
+              v-for="n in Object.keys(config.gradeMap)"
+              :key="n"
+              :value="n"
+              :label="config.gradeMap[n]"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="工单类型">
-          <el-select v-model="queryForm.type" placeholder="请选择工单类型" clearable>
-            <el-option v-for="n in Object.keys(config.typeMap)" :key="n" :value="n" :label="config.typeMap[n]" />
+          <el-select
+            v-model="queryForm.type"
+            placeholder="请选择工单类型"
+            clearable
+          >
+            <el-option
+              v-for="n in Object.keys(config.typeMap)"
+              :key="n"
+              :value="n"
+              :label="config.typeMap[n]"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="工单状态">
-          <el-select v-model="queryForm.status" placeholder="请选择工单状态" clearable>
-            <el-option v-for="n in Object.keys(config.statusMap)" :key="n" :value="n" :label="config.statusMap[n]" />
+          <el-select
+            v-model="queryForm.status"
+            placeholder="请选择工单状态"
+            clearable
+          >
+            <el-option
+              v-for="n in Object.keys(config.statusMap)"
+              :key="n"
+              :value="n"
+              :label="config.statusMap[n]"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="产品名称">
-          <el-input v-model="queryForm.productName" placeholder="请输入产品名称进行模糊查询" class="w-64" clearable />
+          <el-input
+            v-model="queryForm.productName"
+            placeholder="请输入产品名称进行模糊查询"
+            class="w-64"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="员工姓名">
-          <el-select v-model="queryForm.userAccount" placeholder="请选择员工姓名" filterable clearable>
-            <el-option v-for="n in userList" :key="n.id" :value="n.userAccount" :label="n.userName" />
+          <el-select
+            v-model="queryForm.userId"
+            placeholder="请选择员工姓名"
+            filterable
+            clearable
+          >
+            <el-option
+              v-for="n in userList"
+              :key="n.id"
+              :value="n.id"
+              :label="n.userName"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="需求日期">
@@ -59,7 +120,11 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-search" @click="query">查询</el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-search"
+            @click="query"
+          >查询</el-button>
           <el-button icon="el-icon-refresh" @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
@@ -67,7 +132,12 @@
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
         <!-- <el-table-column label="工单编号" prop="code" min-width="120" show-overflow-tooltip /> -->
-        <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
+        <el-table-column
+          label="工单编号 / 工单名称"
+          prop="name"
+          min-width="160"
+          show-overflow-tooltip
+        >
           <template v-slot="{ row }">
             <span>{{ row.code }}</span>
             <br>
@@ -76,7 +146,9 @@
         </el-table-column>
         <el-table-column label="工单级别" min-width="90">
           <template v-slot="{ row }">
-            <el-tag :type="config.gradeTypeMap[row.grade]">{{ config.gradeMap[row.grade] }}</el-tag>
+            <el-tag :type="config.gradeTypeMap[row.grade]">{{
+              config.gradeMap[row.grade]
+            }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="工单类型" min-width="90">
@@ -86,29 +158,69 @@
         </el-table-column>
         <el-table-column label="工单状态" min-width="90">
           <template v-slot="{ row }">
-            <el-tag :type="config.statusTypeMap[row.status]">{{ config.statusMap[row.status] }}</el-tag>
+            <el-tag :type="config.statusTypeMap[row.status]">{{
+              config.statusMap[row.status]
+            }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" show-overflow-tooltip />
+        <el-table-column
+          label="产品名称"
+          prop="productInfo.name"
+          min-width="180"
+          show-overflow-tooltip
+        />
         <el-table-column label="完成数量 / 生产数量" min-width="140">
           <template v-slot="{ row }">
-            <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
+            <span><span
+              :style="{
+                color:
+                  row.completeCount === 0
+                    ? '#F56C6C'
+                    : row.completeCount === row.completeCount
+                      ? '#67C23A'
+                      : '#409EFF',
+              }"
+            >{{ row.completeCount }}</span>
+              / {{ row.count }}</span>
           </template>
         </el-table-column>
         <el-table-column label="需求日期" prop="needDate" min-width="90" />
-        <el-table-column label="备注" prop="remark" min-width="150" show-overflow-tooltip />
+        <el-table-column
+          label="备注"
+          prop="remark"
+          min-width="150"
+          show-overflow-tooltip
+        />
         <el-table-column label="创建时间" prop="createTime" min-width="150" />
         <el-table-column label="更新时间" prop="updateTime" min-width="150" />
         <el-table-column label="操作" width="240" fixed="right">
           <template v-slot="{ row }">
             <el-button type="text" @click="detail(row)">详情</el-button>
-            <el-button type="text" :disabled="row.status !== 'create'" @click="update(row)">修改</el-button>
-            <el-button type="text" :disabled="row.status !== 'create'" @click="del(row)">删除</el-button>
-            <el-button type="text" :disabled="row.status !== 'executed'" @click="send(row)">发货</el-button>
+            <el-button
+              type="text"
+              :disabled="row.status !== 'create'"
+              @click="update(row)"
+            >修改</el-button>
+            <el-button
+              type="text"
+              :disabled="row.status !== 'create'"
+              @click="del(row)"
+            >删除</el-button>
+            <el-button
+              type="text"
+              :disabled="row.status !== 'executed'"
+              @click="send(row)"
+            >发货</el-button>
             <el-button type="text" @click="printWorkOrder(row)">打印</el-button>
             <div v-if="hasPermission">
-              <el-button type="text" @click="update(row, true)">强制修改</el-button>
-              <el-button type="text" @click="del(row, true)">强制删除</el-button>
+              <el-button
+                type="text"
+                @click="update(row, true)"
+              >强制修改</el-button>
+              <el-button
+                type="text"
+                @click="del(row, true)"
+              >强制删除</el-button>
             </div>
           </template>
         </el-table-column>
@@ -124,14 +236,76 @@
       </div>
     </div>
     <create ref="createRef" @success="getList" />
+    <el-dialog
+      title="发货"
+      :visible.sync="deliveryDialogVisible"
+      width="480px"
+      append-to-body
+      @close="resetDeliveryForm"
+    >
+      <el-alert
+        title="请确保线下发货后再进行该操作。"
+        type="warning"
+        :closable="false"
+        class="mb-4"
+      />
+      <el-form
+        ref="deliveryFormRef"
+        :model="deliveryForm"
+        :rules="deliveryRules"
+        label-width="100px"
+      >
+        <el-form-item label="报废数量" prop="scrapCount">
+          <el-input-number
+            v-model="deliveryForm.scrapCount"
+            :min="0"
+            :max="deliveryRow?.count || 1000000"
+            :precision="0"
+            controls-position="right"
+            class="w-full"
+          />
+        </el-form-item>
+        <el-form-item label="发货日期" prop="deliveryDate">
+          <el-date-picker
+            v-model="deliveryForm.deliveryDate"
+            type="date"
+            placeholder="请选择发货日期"
+            value-format="yyyy-MM-dd"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="快递单号" prop="trackingNumber">
+          <el-input
+            v-model="deliveryForm.trackingNumber"
+            placeholder="请输入快递单号"
+            clearable
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="deliveryDialogVisible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          :loading="deliverySubmitting"
+          @click="submitDelivery"
+        >确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import config from './config'
-import { getWorkOrderPage, deleteWorkOrder, forceDeleteWorkOrder, deliveryOrder } from '@/api/workOrder'
+import {
+  getWorkOrderPage,
+  exportWorkOrderExcel,
+  deleteWorkOrder,
+  forceDeleteWorkOrder,
+  deliveryOrder
+} from '@/api/workOrder'
 import { getStaffList } from '@/api/staff'
+import dayjs from 'dayjs'
 import Create from './create'
 
 export default {
@@ -148,12 +322,13 @@ export default {
         type: '',
         status: '',
         productName: '',
-        userAccount: '',
+        userId: '',
         needDate: [],
         createTime: []
       },
       userList: [],
       loading: false,
+      exporting: false,
       tableData: [],
       pageConfig: {
         page: 1,
@@ -162,33 +337,56 @@ export default {
       },
       config,
       pickerOptions: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', [start, end])
+        shortcuts: [
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
           }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-            picker.$emit('pick', [start, end])
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-            picker.$emit('pick', [start, end])
-          }
-        }]
+        ]
       },
-      p: {}
+      p: {},
+      deliveryDialogVisible: false,
+      deliverySubmitting: false,
+      deliveryRow: null,
+      deliveryForm: {
+        scrapCount: 0,
+        deliveryDate: '',
+        trackingNumber: ''
+      },
+      deliveryRules: {
+        scrapCount: [
+          { required: true, message: '请输入报废数量', trigger: 'change' }
+        ],
+        deliveryDate: [
+          { required: true, message: '请选择发货日期', trigger: 'change' }
+        ],
+        trackingNumber: [
+          { required: true, message: '请输入快递单号', trigger: 'blur' }
+        ]
+      }
     }
   },
   computed: {
@@ -217,9 +415,28 @@ export default {
         this.queryForm.type = p.queryParam.type || ''
         this.queryForm.status = p.queryParam.status || ''
         this.queryForm.productName = p.queryParam.productInfoName || ''
-        this.queryForm.userAccount = p.queryParam.userAccount || ''
-        this.queryForm.needDate = p.queryParam.needDateStart ? [p.queryParam.needDateStart, p.queryParam.needDateEnd] : []
-        this.queryForm.createTime = p.queryParam.createTimeStart ? [p.queryParam.createTimeStart, p.queryParam.createTimeEnd] : []
+        this.queryForm.userId = p.queryParam.userId || ''
+        this.queryForm.needDate = p.queryParam.needDateStart
+          ? [p.queryParam.needDateStart, p.queryParam.needDateEnd]
+          : []
+        this.queryForm.createTime = p.queryParam.createTimeStart
+          ? [p.queryParam.createTimeStart, p.queryParam.createTimeEnd]
+          : []
+      }
+    },
+    buildListQueryBody() {
+      return {
+        code: this.queryForm.code || undefined,
+        name: this.queryForm.name || undefined,
+        grade: this.queryForm.grade || undefined,
+        type: this.queryForm.type || undefined,
+        status: this.queryForm.status || undefined,
+        productInfoName: this.queryForm.productName || undefined,
+        userId: this.queryForm.userId || undefined,
+        needDateStart: this.queryForm.needDate?.[0] || undefined,
+        needDateEnd: this.queryForm.needDate?.[1] || undefined,
+        createTimeStart: this.queryForm.createTime?.[0] || undefined,
+        createTimeEnd: this.queryForm.createTime?.[1] || undefined
       }
     },
     getList() {
@@ -227,17 +444,7 @@ export default {
       this.loading = true
       const p = {
         queryParam: {
-          code: this.queryForm.code || undefined,
-          name: this.queryForm.name || undefined,
-          grade: this.queryForm.grade || undefined,
-          type: this.queryForm.type || undefined,
-          status: this.queryForm.status || undefined,
-          productInfoName: this.queryForm.productName || undefined,
-          userAccount: this.queryForm.userAccount || undefined,
-          needDateStart: this.queryForm.needDate?.[0] || undefined,
-          needDateEnd: this.queryForm.needDate?.[1] || undefined,
-          createTimeStart: this.queryForm.createTime?.[0] || undefined,
-          createTimeEnd: this.queryForm.createTime?.[1] || undefined
+          ...this.buildListQueryBody()
         },
         pageParam: {
           page: this.pageConfig.page,
@@ -245,7 +452,7 @@ export default {
         }
       }
       this.p = p
-      getWorkOrderPage(p).then(res => {
+      getWorkOrderPage(p).then((res) => {
         console.log(res)
         this.tableData = res.data.records
         this.pageConfig.total = res.data.total
@@ -257,12 +464,19 @@ export default {
       getStaffList({
         page: 1,
         size: 99
-      }).then(res => {
-        this.userList = res.data.records.filter(n => {
-          return !['admin', 'chenqiming', 'SunShunJie', 'WxTestUser'].includes(n.userAccount)
-        }).sort((a, b) => {
-          return a.userName.localeCompare(b.userName)
-        })
+      }).then((res) => {
+        this.userList = res.data.records
+          .filter((n) => {
+            return ![
+              'admin',
+              'chenqiming',
+              'SunShunJie',
+              'WxTestUser'
+            ].includes(n.userAccount)
+          })
+          .sort((a, b) => {
+            return a.userName.localeCompare(b.userName)
+          })
       })
     },
     query() {
@@ -277,7 +491,7 @@ export default {
         type: '',
         status: '',
         productName: '',
-        userAccount: '',
+        userId: '',
         needDate: [],
         createTime: []
       }
@@ -287,14 +501,54 @@ export default {
     create() {
       this.$refs.createRef.open()
     },
+    async exportExcel() {
+      this.exporting = true
+      try {
+        const res = await exportWorkOrderExcel(this.buildListQueryBody())
+        const blob = res.data
+        if (blob.type && blob.type.includes('application/json')) {
+          const text = await blob.text()
+          const json = JSON.parse(text)
+          this.$message.error(json.message || '导出失败')
+          return
+        }
+        const disposition = res.headers['content-disposition']
+        let filename = `工单导出_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`
+        if (disposition) {
+          const match = /filename\*?=(?:UTF-8'')?([^;\n]+)/i.exec(disposition)
+          if (match && match[1]) {
+            filename = decodeURIComponent(match[1].replace(/['"]/g, '').trim())
+          }
+        }
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+        this.$message.success('导出成功')
+      } catch (e) {
+        console.log(e)
+      } finally {
+        this.exporting = false
+      }
+    },
     update(row, isForce) {
       this.$refs.createRef.open(row, isForce)
     },
     async del(row, isForce) {
       try {
-        await this.$confirm(isForce ? '确定强制删除该工单吗？删除后无法恢复。' : '确定删除该工单吗？删除后无法恢复。', '系统提示', {
-          type: 'warning'
-        })
+        await this.$confirm(
+          isForce
+            ? '确定强制删除该工单吗？删除后无法恢复。'
+            : '确定删除该工单吗？删除后无法恢复。',
+          '系统提示',
+          {
+            type: 'warning'
+          }
+        )
         if (isForce) {
           await forceDeleteWorkOrder({
             id: row.id
@@ -313,22 +567,51 @@ export default {
         console.log(error)
       }
     },
-    async send(row) {
-      try {
-        await this.$confirm('是否确认发货？请确保线下发货后再进行该操作。', '系统提示', {
-          type: 'warning'
-        })
-        await deliveryOrder({
-          id: row.id
-        })
-        this.$message.success({
-          message: '操作成功',
-          type: 'success'
-        })
-        this.getList()
-      } catch (error) {
-        console.log(error)
-      }
+    send(row) {
+      this.deliveryRow = row
+      this.deliveryForm.scrapCount = 0
+      this.deliveryForm.deliveryDate = dayjs().format('YYYY-MM-DD')
+      this.deliveryForm.trackingNumber = ''
+      this.deliveryDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.deliveryFormRef &&
+          this.$refs.deliveryFormRef.clearValidate()
+      })
+    },
+    resetDeliveryForm() {
+      this.deliveryRow = null
+      this.deliverySubmitting = false
+      this.$refs.deliveryFormRef && this.$refs.deliveryFormRef.resetFields()
+    },
+    submitDelivery() {
+      if (!this.deliveryRow) return
+      this.$refs.deliveryFormRef.validate(async(valid) => {
+        if (!valid) return
+        const trackingNumber = (this.deliveryForm.trackingNumber || '').trim()
+        if (!trackingNumber) {
+          this.$message.warning('请输入快递单号')
+          return
+        }
+        this.deliverySubmitting = true
+        try {
+          await deliveryOrder({
+            id: this.deliveryRow.id,
+            scrapCount: this.deliveryForm.scrapCount,
+            deliveryDate: this.deliveryForm.deliveryDate,
+            trackingNumber
+          })
+          this.$message.success({
+            message: '操作成功',
+            type: 'success'
+          })
+          this.deliveryDialogVisible = false
+          this.getList()
+        } catch (error) {
+          console.log(error)
+        } finally {
+          this.deliverySubmitting = false
+        }
+      })
     },
     detail(row) {
       // 缓存查询条件
@@ -415,12 +698,16 @@ export default {
           </head>
           <body>
             <div class="print-sheet">
-              ${fields.map(field => `
+              ${fields
+    .map(
+      (field) => `
                 <div class="print-row">
                   <span class="print-label">${field.label}</span>
                   <span class="print-value">${field.value}</span>
                 </div>
-              `).join('')}
+              `
+    )
+    .join('')}
             </div>
           </body>
         </html>
@@ -436,7 +723,10 @@ export default {
     },
     buildPrintFields(row) {
       const safeText = (value) => {
-        const text = value === null || value === undefined || value === '' ? '-' : String(value)
+        const text =
+          value === null || value === undefined || value === ''
+            ? '-'
+            : String(value)
         return text
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
@@ -454,18 +744,43 @@ export default {
         primary: 'tag-primary',
         danger: 'tag-danger'
       }
-      const gradeType = gradeTypeMap[this.config.gradeTypeMap[row.grade]] || 'tag-primary'
-      const statusType = statusTypeMap[this.config.statusTypeMap[row.status]] || 'tag-primary'
-      const spec = row.productInfo?.specification || row.productInfo?.spec || row.productInfo?.model || row.productInfo?.code || '-'
+      const gradeType =
+        gradeTypeMap[this.config.gradeTypeMap[row.grade]] || 'tag-primary'
+      const statusType =
+        statusTypeMap[this.config.statusTypeMap[row.status]] || 'tag-primary'
+      const spec =
+        row.productInfo?.specification ||
+        row.productInfo?.spec ||
+        row.productInfo?.model ||
+        row.productInfo?.code ||
+        '-'
       return [
         { label: '工单编号', value: safeText(row.code) },
         { label: '工单名称', value: safeText(row.name) },
-        { label: '工单级别', value: `<span class="tag ${gradeType}">${safeText(this.config.gradeMap[row.grade] || '-')}</span>` },
-        { label: '工单类型', value: `<span class="tag tag-danger">${safeText(this.config.typeMap[row.type] || '-')}</span>` },
+        {
+          label: '工单级别',
+          value: `<span class="tag ${gradeType}">${safeText(
+            this.config.gradeMap[row.grade] || '-'
+          )}</span>`
+        },
+        {
+          label: '工单类型',
+          value: `<span class="tag tag-danger">${safeText(
+            this.config.typeMap[row.type] || '-'
+          )}</span>`
+        },
         { label: '产品名称', value: safeText(row.productInfo?.name) },
         { label: '规格型号', value: safeText(spec) },
-        { label: '完成数量 / 生产数量', value: safeText(`${row.completeCount || 0} / ${row.count || 0}`) },
-        { label: '生产状态', value: `<span class="tag ${statusType}">${safeText(this.config.statusMap[row.status] || '-')}</span>` },
+        {
+          label: '完成数量 / 生产数量',
+          value: safeText(`${row.completeCount || 0} / ${row.count || 0}`)
+        },
+        {
+          label: '生产状态',
+          value: `<span class="tag ${statusType}">${safeText(
+            this.config.statusMap[row.status] || '-'
+          )}</span>`
+        },
         { label: '截止时间', value: safeText(row.needDate) },
         { label: '备注', value: safeText(row.remark) }
       ]
@@ -481,5 +796,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped></style>

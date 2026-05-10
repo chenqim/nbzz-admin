@@ -92,6 +92,20 @@ export const asyncRoutes = [
             }
           }
         ]
+      },
+      {
+        path: 'workDetails',
+        name: 'workDetails',
+        component: () => import('@/views/workOrder/index'),
+        redirect: '/production/workOrder/work-details',
+        children: [
+          {
+            path: 'list',
+            name: 'WorkDetailsList',
+            component: () => import('@/views/workOrder/work-details'),
+            meta: { title: '明细管理', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss'] }
+          }
+        ]
       }
       // {
       //   path: 'manufacturing',

@@ -48,6 +48,32 @@ export function getWorkOrderPage(data) {
   })
 }
 
+export function exportWorkOrderExcel(data) {
+  return request({
+    url: '/workOrder/exportWorkOrderExcel',
+    method: 'post',
+    data,
+    responseType: 'blob'
+  })
+}
+
+export function getWorkDetailsPage(data) {
+  return request({
+    url: '/workOrder/queryProcedureExportList',
+    method: 'post',
+    data
+  })
+}
+
+export function exportProcedureExcel(data) {
+  return request({
+    url: '/workOrder/exportProcedureExcel',
+    method: 'post',
+    data,
+    responseType: 'blob'
+  })
+}
+
 export function getWorkOrderDetail(data) {
   return request({
     url: '/workOrder/queryDetail',
@@ -91,6 +117,14 @@ export function queryProduceExecuteTotal(data) {
 export function queryWorkingProcedureList(data) {
   return request({
     url: '/workOrder/queryWorkingProcedureList',
+    method: 'post',
+    data
+  })
+}
+
+export function queryWorkOrderNameList(data) {
+  return request({
+    url: '/workOrder/queryNameList',
     method: 'post',
     data
   })

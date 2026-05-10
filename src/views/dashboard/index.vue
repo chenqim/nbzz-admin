@@ -68,7 +68,12 @@
       </el-form>
     </div>
     <div class="list-panel">
-      <el-table v-loading="loading" :data="tableData">
+      <el-table
+        v-loading="loading"
+        class="dashboard-lately-order-table"
+        :data="tableData"
+        :row-class-name="needDateRowClassName"
+      >
         <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
           <template v-slot="{ row }">
             <span>{{ row.code }}</span>
@@ -79,7 +84,7 @@
         <el-table-column label="产品名称" prop="productInfo.name" min-width="180" />
         <el-table-column label="需求日期" prop="needDate" min-width="180">
           <template v-slot="{ row }">
-            <span style="color: red;font-weight: bold;">{{ row.needDate }}</span>
+            <span style="font-weight: bold;">{{ row.needDate }}</span>
           </template>
         </el-table-column>
         <el-table-column label="完成数量 / 生产数量" min-width="140">
@@ -341,6 +346,28 @@ export default {
       this.pageConfig.page = v
       this.getList()
     },
+    /**
+     * 行底色：全局 overwrite.scss 对 .el-table td 使用了 background !important，
+     * row-style / cell-style 的内联背景无法压过，需用 row-class-name + 同权重 !important。
+     * needDate 如 2026-04-03 或带时间的字符串，取前 10 位再解析。
+     */
+    needDateRowClassName({ row }) {
+      const suffix = this.getNeedDateRowTone(row)
+      return suffix ? `need-date-row--${suffix}` : ''
+    },
+    getNeedDateRowTone(row) {
+      if (!row || row.needDate === undefined || row.needDate === null || row.needDate === '') {
+        return ''
+      }
+      const raw = String(row.needDate).trim()
+      const datePart = raw.length >= 10 ? raw.slice(0, 10) : raw
+      const need = dayjs(datePart).startOf('day')
+      if (!need.isValid()) return ''
+      const diffDays = need.diff(dayjs().startOf('day'), 'day')
+      if (diffDays > 3) return 'safe'
+      if (diffDays >= 0) return 'warn'
+      return 'danger'
+    },
     openWorkOrderModal(n) {
       if (n.id) {
         this.workOrderShow = true
@@ -398,5 +425,16 @@ export default {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 8px;
+}
+
+/* 压过 src/styles/overwrite.scss 里 .el-table td { background !important } */
+.dashboard-lately-order-table ::v-deep tr.need-date-row--safe > td {
+  background-color: #e8f5e9 !important;
+}
+.dashboard-lately-order-table ::v-deep tr.need-date-row--warn > td {
+  background-color: #fff9e6 !important;
+}
+.dashboard-lately-order-table ::v-deep tr.need-date-row--danger > td {
+  background-color: #ffebee !important;
 }
 </style>
