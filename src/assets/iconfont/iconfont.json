@@ -6,6 +6,13 @@
   "description": "管理端",
   "glyphs": [
     {
+      "icon_id": "1111855",
+      "name": "投资明细",
+      "font_class": "mingxi",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
       "icon_id": "15429795",
       "name": "产品类别设置 goods/ppe/category",
       "font_class": "chanpinliebie",

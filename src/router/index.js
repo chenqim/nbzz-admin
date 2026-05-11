@@ -103,7 +103,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'WorkDetailsList',
             component: () => import('@/views/workOrder/work-details'),
-            meta: { title: '明细管理', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss'] }
+            meta: { title: '明细管理', icon: 'iconfont icon-mingxi', roles: ['Admin', 'Boss'] }
           }
         ]
       }

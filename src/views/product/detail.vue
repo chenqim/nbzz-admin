@@ -5,7 +5,7 @@
       icon="el-icon-back"
       @click="$router.push({ name: 'ProductList' })"
     >返回列表</el-button>
-    <el-descriptions class="margin-top" title="产品基本信息" :column="2" border>
+    <el-descriptions title="产品基本信息" :column="2" border>
       <el-descriptions-item label="产品编号">{{ ins.code }}</el-descriptions-item>
       <el-descriptions-item label="产品名称">{{ ins.name }}</el-descriptions-item>
       <el-descriptions-item label="产品类别">{{ ins.productCategory?.name }}</el-descriptions-item>
