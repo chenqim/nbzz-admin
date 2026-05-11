@@ -7,10 +7,10 @@
         @click="create"
       >创建</el-button>
       <el-button
-        icon="el-icon-download"
+        icon="el-icon-upload2"
         :loading="exporting"
         @click="exportExcel"
-      >导出</el-button>
+      >导出工单</el-button>
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="工单编号">
           <el-input
@@ -396,10 +396,8 @@ export default {
     }
   },
   created() {
-    console.log('created')
     this.getList()
     this.getUserList()
-    console.log(this.roles)
   },
   methods: {
     // 缓存查询条件,详情页返回时使用
@@ -453,7 +451,6 @@ export default {
       }
       this.p = p
       getWorkOrderPage(p).then((res) => {
-        console.log(res)
         this.tableData = res.data.records
         this.pageConfig.total = res.data.total
         this.loading = false

@@ -2,10 +2,10 @@
   <div class="app-container">
     <div class="search-panel">
       <el-button
-        icon="el-icon-download"
+        icon="el-icon-upload2"
         :loading="exporting"
         @click="exportExcel"
-      >导出</el-button>
+      >导出工单明细</el-button>
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="工单编号">
           <el-input
@@ -126,7 +126,6 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
-        <!-- <el-table-column label="工单编号" prop="code" min-width="120" show-overflow-tooltip /> -->
         <el-table-column
           label="工单编号 / 工单名称"
           prop="name"
@@ -205,7 +204,7 @@ export default {
         productName: '',
         userId: '',
         needDate: [],
-        createTime: ['2026-05-01', '2026-05-10']
+        createTime: []
       },
       userList: [],
       loading: false,
@@ -247,39 +246,14 @@ export default {
             }
           }
         ]
-      },
-      p: {}
+      }
     }
   },
   created() {
-    console.log('created')
     this.getList()
     this.getUserList()
-    console.log(this.roles)
   },
   methods: {
-    // 缓存查询条件,详情页返回时使用
-    handleCacheQueryParams() {
-      const sp = sessionStorage.getItem('p')
-      if (sp) {
-        const p = JSON.parse(sp)
-        this.pageConfig.page = p.pageParam.page || 1
-        this.pageConfig.size = p.pageParam.size || 20
-        this.queryForm.code = p.queryParam.code || ''
-        this.queryForm.name = p.queryParam.name || ''
-        this.queryForm.grade = p.queryParam.grade || ''
-        this.queryForm.type = p.queryParam.type || ''
-        this.queryForm.status = p.queryParam.status || ''
-        this.queryForm.productName = p.queryParam.productInfoName || ''
-        this.queryForm.userId = p.queryParam.userId || ''
-        this.queryForm.needDate = p.queryParam.needDateStart
-          ? [p.queryParam.needDateStart, p.queryParam.needDateEnd]
-          : []
-        this.queryForm.createTime = p.queryParam.createTimeStart
-          ? [p.queryParam.createTimeStart, p.queryParam.createTimeEnd]
-          : []
-      }
-    },
     buildListQueryBody() {
       return {
         code: this.queryForm.code || undefined,
@@ -296,24 +270,20 @@ export default {
       }
     },
     getList() {
-      this.handleCacheQueryParams()
       this.loading = true
       const p = {
-        ...this.buildListQueryBody()
-        // queryParam: {
-        // },
-        // pageParam: {
-        //   page: this.pageConfig.page,
-        //   size: this.pageConfig.size
-        // }
+        queryParam: {
+          ...this.buildListQueryBody()
+        },
+        pageParam: {
+          page: this.pageConfig.page,
+          size: this.pageConfig.size
+        }
       }
-      this.p = p
       getWorkDetailsPage(p).then((res) => {
-        console.log(res)
-        this.tableData = res.data
+        this.tableData = res.data.records
         this.pageConfig.total = res.data.total
         this.loading = false
-        sessionStorage.clear()
       })
     },
     getUserList() {
@@ -366,7 +336,7 @@ export default {
           return
         }
         const disposition = res.headers['content-disposition']
-        let filename = `明细导出_${dayjs().format('YYYY-MM-DD HH:mm:ss')}.xlsx`
+        let filename = `明细导出_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`
         if (disposition) {
           const match = /filename\*?=(?:UTF-8'')?([^;\n]+)/i.exec(disposition)
           if (match && match[1]) {

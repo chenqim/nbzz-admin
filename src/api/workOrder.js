@@ -59,7 +59,7 @@ export function exportWorkOrderExcel(data) {
 
 export function getWorkDetailsPage(data) {
   return request({
-    url: '/workOrder/queryProcedureExportList',
+    url: '/workOrder/queryProcedureExportListByPage',
     method: 'post',
     data
   })
