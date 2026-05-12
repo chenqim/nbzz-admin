@@ -121,14 +121,23 @@
     <el-dialog
       title="工序进度"
       :visible.sync="dialogVisible"
-      width="500px"
+      width="560px"
     >
-      <div v-loading="dialogLoading">
-        <div v-for="p in ins.procedureList" :key="p.id" class="mb-4">
-          <div class="head">{{ p.workingProcedure.name }} [ {{ p.workingProcedure.code }} ]</div>
-          <div>
-            <el-progress :stroke-width="12" :color="customColors" :percentage="p.count === 0 ? 0 : Number(((p.completeCount / p.count) * 100).toFixed(0))" />
+      <div v-loading="dialogLoading" class="process-progress-list">
+        <div v-for="p in ins.procedureList" :key="p.id" class="process-progress-item">
+          <div class="process-progress-item__head">
+            <div class="process-progress-item__meta">
+              <span class="process-progress-item__name">{{ p.workingProcedure.name }}</span>
+              <span class="process-progress-item__code">{{ p.workingProcedure.code }}</span>
+            </div>
+            <span class="process-progress-item__user">{{ p.userName || '暂无认领人' }}</span>
           </div>
+          <el-progress
+            class="process-progress-item__bar"
+            :stroke-width="8"
+            :color="customColors"
+            :percentage="p.count === 0 ? 0 : Number(((p.completeCount / p.count) * 100).toFixed(0))"
+          />
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -335,7 +344,7 @@ export default {
         // params: {
         //   id: row.id
         // }
-        path: `/production/workOrder/detail/${row.id}`
+        path: `/production/workOrder/detail/${row.id}?from=dashboard`
       })
     },
     sizeChange(v) {
@@ -421,10 +430,77 @@ export default {
   font-weight: 700;
   color: #666666;
 }
-.head {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 8px;
+.process-progress-list {
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  padding-right: 4px;
+  margin: -4px 0;
+}
+
+.process-progress-item {
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  background: #fafbfc;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    border-color: #dcdfe6;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.process-progress-item__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.process-progress-item__meta {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.process-progress-item__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+}
+
+.process-progress-item__code {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #606266;
+  line-height: 1.4;
+  padding: 2px 8px;
+  background: #eef0f3;
+  border-radius: 4px;
+  vertical-align: baseline;
+}
+
+.process-progress-item__user {
+  font-size: 12px;
+  color: #606266;
+  text-align: right;
+  line-height: 1.5;
+}
+
+.process-progress-item__bar {
+  margin-top: 2px;
 }
 
 /* 压过 src/styles/overwrite.scss 里 .el-table td { background !important } */

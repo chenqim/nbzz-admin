@@ -3,7 +3,7 @@
     <el-button
       class="mb-4"
       icon="el-icon-back"
-      @click="$router.push({name: 'WorkOrderList'})"
+      @click="goBack"
     >返回列表</el-button>
     <el-descriptions title="工单基本信息" :column="2" border :label-style="{ width: '180px' }">
       <el-descriptions-item label="工单编号">{{ ins.code }}</el-descriptions-item>
@@ -75,10 +75,12 @@ export default {
         { color: '#409eff', percentage: 99 },
         { color: '#67c23a', percentage: 100 }
       ],
-      config
+      config,
+      from: 'WorkOrderList'
     }
   },
   created() {
+    this.from = this.$route.query.from || 'workOrderList'
     this.getDetail()
   },
   methods: {
@@ -91,6 +93,13 @@ export default {
         console.log(res.data)
         this.loading = false
       })
+    },
+    goBack() {
+      if (this.from === 'dashboard') {
+        this.$router.push({ name: 'Dashboard' })
+      } else {
+        this.$router.push({ name: 'WorkOrderList' })
+      }
     }
   }
 }
