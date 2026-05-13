@@ -793,3 +793,13 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+/* tooltip 挂载在 body，需非 scoped；与 Element 默认单行样式对齐 */
+.el-tooltip__popper {
+  max-width: min(360px, 85vw);
+  line-height: 1.5;
+  white-space: normal;
+  word-break: break-word;
+}
+</style>

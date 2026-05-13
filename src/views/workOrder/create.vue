@@ -55,10 +55,10 @@
         <el-input-number v-model="model.count" :precision="0" :min="1" :max="100000000" class="w-full" />
       </el-form-item>
       <el-form-item label="执行日期" prop="execDate">
-        <el-date-picker v-model="model.execDate" type="date" placeholder="选择日期" class="w-full" />
+        <el-date-picker v-model="model.execDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期" class="w-full" />
       </el-form-item>
       <el-form-item label="需求日期" prop="needDate">
-        <el-date-picker v-model="model.needDate" type="date" placeholder="选择日期" class="w-full" />
+        <el-date-picker v-model="model.needDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期" class="w-full" />
       </el-form-item>
       <el-form-item label="关联工序" prop="procedureList">
         <el-checkbox-group v-if="processList?.length" v-model="model.procedureList">

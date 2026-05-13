@@ -5,7 +5,7 @@
       icon="el-icon-back"
       @click="goBack"
     >返回列表</el-button>
-    <el-descriptions title="工单基本信息" :column="2" border :label-style="{ width: '180px' }">
+    <el-descriptions title="工单基本信息" :column="2" border :label-style="{ width: '180px' }" :content-style="{ minWidth: '180px',maxWidth: '400px' }">
       <el-descriptions-item label="工单编号">{{ ins.code }}</el-descriptions-item>
       <el-descriptions-item label="工单名称">{{ ins.name }}</el-descriptions-item>
       <el-descriptions-item label="工单级别">

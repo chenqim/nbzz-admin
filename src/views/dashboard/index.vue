@@ -87,16 +87,38 @@
             <span style="font-weight: bold;">{{ row.needDate }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="完成数量 / 生产数量" min-width="140">
+        <el-table-column label="完成数量 / 生产数量" min-width="130">
           <template v-slot="{ row }">
             <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="工单进度" prop="a" min-width="180">
+        <el-table-column label="工单进度" prop="a" min-width="120">
           <template v-slot="{ row }">
             <span>{{ Number((row.completeCount / row.count).toFixed(2)) * 100 }}%</span>
           </template>
         </el-table-column>
+        <!-- <el-table-column label="备注" prop="remark" min-width="200">
+          <template v-slot="{ row }">
+            <div class="dashboard-remark-cell">
+              <el-tooltip
+                class="dashboard-remark-cell__tooltip"
+                popper-class="dashboard-remark-tooltip"
+                placement="top"
+                :content="row.remark ? String(row.remark) : ''"
+                :disabled="!row.remark"
+              >
+                <span class="dashboard-remark-cell__text">{{ row.remark || '-' }}</span>
+              </el-tooltip>
+              <el-button
+                type="text"
+                class="dashboard-remark-cell__edit"
+                icon="el-icon-edit-outline"
+                style="font-size: 16px;"
+                @click.stop="openRemarkDialog(row)"
+              />
+            </div>
+          </template>
+        </el-table-column> -->
         <el-table-column label="工序进度" width="180">
           <template v-slot="{ row }">
             <el-button type="text" @click="processDetail(row)">查看工序进度</el-button>
@@ -144,6 +166,29 @@
         <el-button @click="cancel">关闭</el-button>
       </span>
     </el-dialog>
+    <!-- <el-dialog
+      title="修改备注"
+      :visible.sync="remarkDialogVisible"
+      width="480px"
+      append-to-body
+      @close="resetRemarkForm"
+    >
+      <el-form :model="remarkForm" label-width="80px">
+        <el-form-item label="备注">
+          <el-input
+            v-model="remarkForm.remark"
+            type="textarea"
+            :rows="4"
+            resize="none"
+            placeholder="请输入备注"
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="remarkDialogVisible = false">取 消</el-button>
+        <el-button type="primary" :loading="remarkSubmitting" @click="submitRemark">确 定</el-button>
+      </span>
+    </el-dialog> -->
     <el-dialog
       :title="titleMap[workOrderTitle]"
       :visible.sync="workOrderShow"
@@ -250,7 +295,13 @@ export default {
         notFinsh: 'processOrderCount'
       },
       dialogTableLoading: false,
-      dialogTableData: []
+      dialogTableData: [],
+      remarkDialogVisible: false,
+      remarkSubmitting: false,
+      remarkRow: null,
+      remarkForm: {
+        remark: ''
+      }
     }
   },
   created() {
@@ -390,7 +441,41 @@ export default {
           this.dialogTableLoading = false
         })
       }
+    },
+    openRemarkDialog(row) {
+      this.remarkRow = row
+      this.remarkForm.remark = row.remark || ''
+      this.remarkDialogVisible = true
+    },
+    resetRemarkForm() {
+      this.remarkRow = null
+      this.remarkSubmitting = false
+      this.remarkForm.remark = ''
     }
+    // async submitRemark() {
+    //   if (!this.remarkRow) return
+    //   this.remarkSubmitting = true
+    //   try {
+    //     const remark = this.remarkForm.remark === undefined || this.remarkForm.remark === null
+    //       ? ''
+    //       : String(this.remarkForm.remark).trim()
+    //     await forceUpdateWorkOrder({
+    //       id: this.remarkRow.id,
+    //       count: this.remarkRow.count,
+    //       remark
+    //     })
+    //     this.$message.success({
+    //       message: '修改成功',
+    //       type: 'success'
+    //     })
+    //     this.remarkDialogVisible = false
+    //     this.getList()
+    //   } catch (error) {
+    //     console.log(error)
+    //   } finally {
+    //     this.remarkSubmitting = false
+    //   }
+    // }
   }
 }
 </script>
@@ -512,5 +597,47 @@ export default {
 }
 .dashboard-lately-order-table ::v-deep tr.need-date-row--danger > td {
   background-color: #ffebee !important;
+}
+
+.dashboard-remark-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dashboard-remark-cell__tooltip {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-remark-cell__text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-remark-cell__edit {
+  flex-shrink: 0;
+  padding: 0 2px !important;
+  min-width: auto !important;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.dashboard-lately-order-table ::v-deep tr:hover .dashboard-remark-cell__edit {
+  opacity: 1;
+}
+</style>
+
+<style lang="scss">
+/* tooltip 挂载在 body，需非 scoped；与 Element 默认单行样式对齐 */
+.el-tooltip__popper.dashboard-remark-tooltip {
+  max-width: min(360px, 85vw);
+  line-height: 1.5;
+  white-space: normal;
+  word-break: break-word;
 }
 </style>
