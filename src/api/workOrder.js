@@ -32,6 +32,14 @@ export function updateWorkOrder(data) {
   })
 }
 
+export function updateWorkOrderRemark(data) {
+  return request({
+    url: '/workOrder/updateRemark',
+    method: 'post',
+    data
+  })
+}
+
 export function forceUpdateWorkOrder(data) {
   return request({
     url: '/workOrder/forceUpdate',

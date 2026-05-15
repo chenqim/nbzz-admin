@@ -97,18 +97,19 @@
             <span>{{ Number((row.completeCount / row.count).toFixed(2)) * 100 }}%</span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="备注" prop="remark" min-width="200">
+        <el-table-column label="备注" prop="remark" min-width="200">
           <template v-slot="{ row }">
             <div class="dashboard-remark-cell">
-              <el-tooltip
-                class="dashboard-remark-cell__tooltip"
-                popper-class="dashboard-remark-tooltip"
-                placement="top"
-                :content="row.remark ? String(row.remark) : ''"
-                :disabled="!row.remark"
-              >
-                <span class="dashboard-remark-cell__text">{{ row.remark || '-' }}</span>
-              </el-tooltip>
+              <div class="dashboard-remark-cell__text-wrap">
+                <el-tooltip
+                  popper-class="dashboard-remark-tooltip"
+                  placement="top"
+                  :content="row.remark ? String(row.remark) : ''"
+                  :disabled="!row.remark"
+                >
+                  <span class="dashboard-remark-cell__text">{{ row.remark || '-' }}</span>
+                </el-tooltip>
+              </div>
               <el-button
                 type="text"
                 class="dashboard-remark-cell__edit"
@@ -118,7 +119,7 @@
               />
             </div>
           </template>
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column label="工序进度" width="180">
           <template v-slot="{ row }">
             <el-button type="text" @click="processDetail(row)">查看工序进度</el-button>
@@ -166,7 +167,7 @@
         <el-button @click="cancel">关闭</el-button>
       </span>
     </el-dialog>
-    <!-- <el-dialog
+    <el-dialog
       title="修改备注"
       :visible.sync="remarkDialogVisible"
       width="480px"
@@ -188,7 +189,7 @@
         <el-button @click="remarkDialogVisible = false">取 消</el-button>
         <el-button type="primary" :loading="remarkSubmitting" @click="submitRemark">确 定</el-button>
       </span>
-    </el-dialog> -->
+    </el-dialog>
     <el-dialog
       :title="titleMap[workOrderTitle]"
       :visible.sync="workOrderShow"
@@ -244,7 +245,7 @@
 <script>
 import dayjs from 'dayjs'
 import config from '../workOrder/config.js'
-import { queryLatelyByPage, queryOrderAchieveTotal, queryProduceExecuteTotal, getWorkOrderDetail, queryTotalOrderList } from '@/api/workOrder'
+import { queryLatelyByPage, queryOrderAchieveTotal, queryProduceExecuteTotal, getWorkOrderDetail, queryTotalOrderList, updateWorkOrderRemark } from '@/api/workOrder'
 
 export default {
   name: 'Dashboard',
@@ -451,31 +452,31 @@ export default {
       this.remarkRow = null
       this.remarkSubmitting = false
       this.remarkForm.remark = ''
+    },
+    async submitRemark() {
+      if (!this.remarkRow) return
+      this.remarkSubmitting = true
+      try {
+        const remark = this.remarkForm.remark === undefined || this.remarkForm.remark === null
+          ? ''
+          : String(this.remarkForm.remark).trim()
+        await updateWorkOrderRemark({
+          id: this.remarkRow.id,
+          count: this.remarkRow.count,
+          remark
+        })
+        this.$message.success({
+          message: '修改成功',
+          type: 'success'
+        })
+        this.remarkDialogVisible = false
+        this.getList()
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.remarkSubmitting = false
+      }
     }
-    // async submitRemark() {
-    //   if (!this.remarkRow) return
-    //   this.remarkSubmitting = true
-    //   try {
-    //     const remark = this.remarkForm.remark === undefined || this.remarkForm.remark === null
-    //       ? ''
-    //       : String(this.remarkForm.remark).trim()
-    //     await forceUpdateWorkOrder({
-    //       id: this.remarkRow.id,
-    //       count: this.remarkRow.count,
-    //       remark
-    //     })
-    //     this.$message.success({
-    //       message: '修改成功',
-    //       type: 'success'
-    //     })
-    //     this.remarkDialogVisible = false
-    //     this.getList()
-    //   } catch (error) {
-    //     console.log(error)
-    //   } finally {
-    //     this.remarkSubmitting = false
-    //   }
-    // }
   }
 }
 </script>
@@ -607,13 +608,17 @@ export default {
   min-width: 0;
 }
 
-.dashboard-remark-cell__tooltip {
+.dashboard-remark-cell__text-wrap {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
+/* el-tooltip 的 reference 是插槽根节点（此处为 span），须随文案收缩宽度，不能用 block 拉满整格 */
 .dashboard-remark-cell__text {
-  display: block;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
