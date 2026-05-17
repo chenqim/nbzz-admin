@@ -19,43 +19,48 @@
       <el-descriptions-item label="更新时间">{{ ins.updateTime }}</el-descriptions-item>
     </el-descriptions>
     <div class="mt-4 mb-4 flex items-center justify-between">
-      <span style="font-size: 16px;font-weight: bold;">系数信息</span>
-      <el-button type="primary">选择客户</el-button>
+      <span style="font-size: 16px;font-weight: bold;">产品系数关联客户信息</span>
+      <el-button icon="el-icon-plus" type="primary" @click="addRelation">添加关联关系</el-button>
     </div>
-    <el-table :data="tableData">
-      <el-table-column label="客户名称" prop="name" />
-      <el-table-column label="系数" prop="coefficient" />
-      <el-table-column label="操作">
+    <el-table v-loading="relationLoading" :data="tableData" border stripe>
+      <el-table-column label="客户名称" prop="customerName" min-width="140" show-overflow-tooltip />
+      <el-table-column label="系数" prop="wageCoefficient" min-width="100" />
+      <el-table-column label="系数上一次更新时间" prop="coefficientChangeTime" show-overflow-tooltip />
+      <el-table-column label="备注" prop="remark" min-width="160" show-overflow-tooltip>
+        <template v-slot="{ row }">{{ row.remark || '-' }}</template>
+      </el-table-column>
+      <el-table-column label="创建时间" prop="createTime" show-overflow-tooltip />
+      <el-table-column label="更新时间" prop="updateTime" show-overflow-tooltip />
+      <el-table-column label="操作" width="120" fixed="right" align="center">
         <template v-slot="{ row }">
           <el-button type="text" @click="edit(row)">修改</el-button>
           <el-button type="text" @click="del(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <relation-dialog ref="relationDialogRef" @success="getRelationList" />
   </div>
 </template>
 
 <script>
-import { getProductDetail } from '@/api/product'
+import {
+  getProductDetail,
+  queryCustomerRelationListByProduct,
+  deleteCustomerRelation
+} from '@/api/product'
+import RelationDialog from './relation-dialog'
 
 export default {
   name: 'ProductDetail',
+  components: {
+    RelationDialog
+  },
   data() {
     return {
       loading: false,
-      ins: {
-        code: 'CP_1758179972366',
-        name: '非球面[夹角59.877度]',
-        productCategory: {
-          name: '钻石刀具'
-        },
-        mainName: '非球面',
-        spec: '夹角59.877度',
-        status: 'enable',
-        remark: '',
-        createTime: '2025-09-18 15:20:46',
-        updateTime: '2025-09-18 15:20:46'
-      },
+      relationLoading: false,
+      ins: {},
       statusMap: {
         enable: '启用',
         disable: '禁用'
@@ -64,28 +69,57 @@ export default {
         enable: 'success',
         disable: 'danger'
       },
-      tableData: [
-        { name: '客户1', coefficient: '80%' },
-        { name: '客户2', coefficient: '90%' },
-        { name: '客户3', coefficient: '100%' }
-      ]
+      tableData: []
     }
   },
   created() {
-    // this.getDetail()
+    this.getDetail()
   },
   methods: {
     getDetail() {
       this.loading = true
       getProductDetail({
         id: this.$route.params.id
-      }).then(res => {
-        this.ins = res.data
-        this.loading = false
       })
+        .then((res) => {
+          this.ins = res.data || {}
+          this.getRelationList()
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
-    edit(row) {},
-    del(row) {}
+    getRelationList() {
+      if (!this.ins.id) return
+      this.relationLoading = true
+      queryCustomerRelationListByProduct({
+        id: this.ins.id
+      })
+        .then((res) => {
+          this.tableData = Array.isArray(res.data) ? res.data : (res.data?.records || [])
+        })
+        .finally(() => {
+          this.relationLoading = false
+        })
+    },
+    addRelation() {
+      this.$refs.relationDialogRef.openAdd(this.ins.id)
+    },
+    edit(row) {
+      this.$refs.relationDialogRef.openEdit(row, this.ins.id)
+    },
+    async del(row) {
+      try {
+        await this.$confirm(`确定删除产品【 ${this.ins.name} 】与客户【 ${row.customerName} 】的关联关系吗？`, '系统提示', {
+          type: 'warning'
+        })
+        await deleteCustomerRelation({ id: row.id })
+        this.$message.success('删除成功')
+        this.getRelationList()
+      } catch (error) {
+        console.log(error)
+      }
+    }
   }
 }
 </script>

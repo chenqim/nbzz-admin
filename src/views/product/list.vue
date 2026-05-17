@@ -4,10 +4,10 @@
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="产品编号">
-          <el-input v-model="queryForm.code" />
+          <el-input v-model="queryForm.code" clearable />
         </el-form-item>
         <el-form-item label="产品名称">
-          <el-input v-model="queryForm.name" />
+          <el-input v-model="queryForm.name" clearable />
         </el-form-item>
         <el-form-item label="产品类别">
           <el-select v-model="queryForm.category" filterable clearable>
@@ -42,7 +42,7 @@
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
         <el-table-column label="操作" width="220" fixed="right">
           <template v-slot="{ row }">
-            <!-- <el-button type="text" @click="detail(row)">详情</el-button> -->
+            <el-button type="text" @click="detail(row)">详情</el-button>
             <el-button type="text" @click="update(row)">修改</el-button>
             <el-button type="text" @click="del(row)">删除</el-button>
           </template>

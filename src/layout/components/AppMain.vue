@@ -11,6 +11,11 @@ export default {
   name: 'AppMain',
   computed: {
     key() {
+      const { matched } = this.$route
+      // 嵌套路由用父级 path 作为 key，避免列表↔详情切换时销毁中间层 router-view
+      if (matched.length > 2) {
+        return matched[matched.length - 2].path
+      }
       return this.$route.path
     }
   }

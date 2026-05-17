@@ -252,7 +252,7 @@
       <el-form
         ref="deliveryFormRef"
         :model="deliveryForm"
-        :rules="deliveryRules"
+        :rules="dynamicDeliveryRules"
         label-width="100px"
       >
         <el-form-item label="报废数量" prop="scrapCount">
@@ -265,19 +265,27 @@
             class="w-full"
           />
         </el-form-item>
-        <el-form-item label="发货日期" prop="deliveryDate">
+        <el-form-item label="发货类型" prop="trackingType">
+          <el-radio-group v-model="deliveryForm.trackingType">
+            <!-- <el-radio label="1">上门自提</el-radio>
+            <el-radio label="2">送货上门</el-radio>
+            <el-radio label="3">快递发货</el-radio> -->
+            <el-radio v-for="n in Object.keys(config.trackingTypeMap)" :key="n" :label="n">{{ config.trackingTypeMap[n] }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="dateLabel" prop="deliveryDate">
           <el-date-picker
             v-model="deliveryForm.deliveryDate"
             type="date"
-            placeholder="请选择发货日期"
+            :placeholder="datePlaceholer"
             value-format="yyyy-MM-dd"
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="快递单号" prop="trackingNumber">
+        <el-form-item :label="numberLabel" prop="trackingNumber">
           <el-input
             v-model="deliveryForm.trackingNumber"
-            placeholder="请输入快递单号"
+            :placeholder="numberPlaceholder"
             clearable
           />
         </el-form-item>
@@ -367,12 +375,12 @@ export default {
           }
         ]
       },
-      p: {},
       deliveryDialogVisible: false,
       deliverySubmitting: false,
       deliveryRow: null,
       deliveryForm: {
         scrapCount: 0,
+        trackingType: '',
         deliveryDate: '',
         trackingNumber: ''
       },
@@ -380,11 +388,8 @@ export default {
         scrapCount: [
           { required: true, message: '请输入报废数量', trigger: 'change' }
         ],
-        deliveryDate: [
-          { required: true, message: '请选择发货日期', trigger: 'change' }
-        ],
-        trackingNumber: [
-          { required: true, message: '请输入快递单号', trigger: 'blur' }
+        trackingType: [
+          { required: true, message: '请选择发货类型', trigger: 'change' }
         ]
       }
     }
@@ -393,6 +398,29 @@ export default {
     ...mapGetters(['roles']),
     hasPermission() {
       return this.roles.includes('Admin')
+    },
+    dateLabel() {
+      return this.deliveryForm.trackingType === '3' ? '发货日期' : this.deliveryForm.trackingType === '2' ? '送货日期' : '自提日期'
+    },
+    datePlaceholer() {
+      return this.deliveryForm.trackingType === '3' ? '请选择发货日期' : this.deliveryForm.trackingType === '2' ? '请选择送货日期' : '请选择自提日期'
+    },
+    numberLabel() {
+      return this.deliveryForm.trackingType === '3' ? '快递单号' : this.deliveryForm.trackingType === '2' ? '送货人员' : '自提人员'
+    },
+    numberPlaceholder() {
+      return this.deliveryForm.trackingType === '3' ? '请输入快递单号' : this.deliveryForm.trackingType === '2' ? '请输入送货人员' : '请输入自提人员'
+    },
+    dynamicDeliveryRules() {
+      return {
+        ...this.deliveryRules,
+        deliveryDate: [
+          { required: true, message: this.datePlaceholer, trigger: 'change' }
+        ],
+        trackingNumber: [
+          { required: true, message: this.numberPlaceholder, trigger: 'blur' }
+        ]
+      }
     }
   },
   created() {
@@ -400,28 +428,6 @@ export default {
     this.getUserList()
   },
   methods: {
-    // 缓存查询条件,详情页返回时使用
-    handleCacheQueryParams() {
-      const sp = sessionStorage.getItem('p')
-      if (sp) {
-        const p = JSON.parse(sp)
-        this.pageConfig.page = p.pageParam.page || 1
-        this.pageConfig.size = p.pageParam.size || 20
-        this.queryForm.code = p.queryParam.code || ''
-        this.queryForm.name = p.queryParam.name || ''
-        this.queryForm.grade = p.queryParam.grade || ''
-        this.queryForm.type = p.queryParam.type || ''
-        this.queryForm.status = p.queryParam.status || ''
-        this.queryForm.productName = p.queryParam.productInfoName || ''
-        this.queryForm.userId = p.queryParam.userId || ''
-        this.queryForm.needDate = p.queryParam.needDateStart
-          ? [p.queryParam.needDateStart, p.queryParam.needDateEnd]
-          : []
-        this.queryForm.createTime = p.queryParam.createTimeStart
-          ? [p.queryParam.createTimeStart, p.queryParam.createTimeEnd]
-          : []
-      }
-    },
     buildListQueryBody() {
       return {
         code: this.queryForm.code || undefined,
@@ -438,9 +444,8 @@ export default {
       }
     },
     getList() {
-      this.handleCacheQueryParams()
       this.loading = true
-      const p = {
+      getWorkOrderPage({
         queryParam: {
           ...this.buildListQueryBody()
         },
@@ -448,13 +453,10 @@ export default {
           page: this.pageConfig.page,
           size: this.pageConfig.size
         }
-      }
-      this.p = p
-      getWorkOrderPage(p).then((res) => {
+      }).then((res) => {
         this.tableData = res.data.records
         this.pageConfig.total = res.data.total
         this.loading = false
-        sessionStorage.clear()
       })
     },
     getUserList() {
@@ -567,6 +569,7 @@ export default {
     send(row) {
       this.deliveryRow = row
       this.deliveryForm.scrapCount = 0
+      this.deliveryForm.trackingType = '3'
       this.deliveryForm.deliveryDate = dayjs().format('YYYY-MM-DD')
       this.deliveryForm.trackingNumber = ''
       this.deliveryDialogVisible = true
@@ -594,6 +597,7 @@ export default {
           await deliveryOrder({
             id: this.deliveryRow.id,
             scrapCount: this.deliveryForm.scrapCount,
+            trackingType: this.deliveryForm.trackingType,
             deliveryDate: this.deliveryForm.deliveryDate,
             trackingNumber
           })
@@ -611,8 +615,6 @@ export default {
       })
     },
     detail(row) {
-      // 缓存查询条件
-      sessionStorage.setItem('p', JSON.stringify(this.p))
       this.$router.push({
         name: 'WorkOrderDetail',
         params: {

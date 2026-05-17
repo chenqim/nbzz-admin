@@ -59,3 +59,43 @@ export function getProductDetail(data) {
     data
   })
 }
+
+export function createCustomerRelation(data) {
+  return request({
+    url: '/productInfo/createCustomerRelation',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteCustomerRelation(data) {
+  return request({
+    url: '/productInfo/deleteCustomerRelation',
+    method: 'post',
+    data
+  })
+}
+
+export function queryCustomerRelationListByProduct(data) {
+  return request({
+    url: '/productInfo/queryCustomerRelationListByProduct',
+    method: 'post',
+    data
+  })
+}
+
+export function queryCustomerRelationListByCustomer(data) {
+  return request({
+    url: '/productInfo/queryCustomerRelationListByCustomer',
+    method: 'post',
+    data
+  })
+}
+
+export function updateCustomerRelation(data) {
+  return request({
+    url: '/productInfo/updateCustomerRelation',
+    method: 'post',
+    data
+  })
+}

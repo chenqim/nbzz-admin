@@ -32,4 +32,10 @@ config.statusTypeMap = {
   completed: 'success'
 }
 
+config.trackingTypeMap = {
+  1: '上门自提',
+  2: '送货上门',
+  3: '快递发货'
+}
+
 export default config

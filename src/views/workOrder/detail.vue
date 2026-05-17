@@ -21,8 +21,9 @@
       <el-descriptions-item label="需求日期">{{ ins.needDate }}</el-descriptions-item>
       <el-descriptions-item label="备注">{{ ins.remark || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报废数量">{{ ins.scrapCount || 0 }}</el-descriptions-item>
-      <el-descriptions-item label="快递单号">{{ ins.trackingNumber || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="发货日期">{{ ins.deliveryDate || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="发货类型">{{ config.trackingTypeMap[ins.trackingType] || ins.trackingType || config.trackingTypeMap['3'] }}</el-descriptions-item>
+      <el-descriptions-item :label="dateLabel">{{ ins.deliveryDate || '-' }}</el-descriptions-item>
+      <el-descriptions-item :label="numberLabel">{{ ins.trackingNumber || '-' }}</el-descriptions-item>
       <el-descriptions-item label="创建时间">{{ ins.createTime }}</el-descriptions-item>
       <el-descriptions-item label="更新时间">{{ ins.updateTime }}</el-descriptions-item>
     </el-descriptions>
@@ -77,6 +78,14 @@ export default {
       ],
       config,
       from: 'WorkOrderList'
+    }
+  },
+  computed: {
+    dateLabel() {
+      return this.ins.trackingType === '1' ? '自提日期' : this.ins.trackingType === '2' ? '送货日期' : '发货日期'
+    },
+    numberLabel() {
+      return this.ins.trackingType === '1' ? '自提人员' : this.ins.trackingType === '2' ? '送货人员' : '快递单号'
     }
   },
   created() {

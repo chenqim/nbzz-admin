@@ -203,7 +203,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/system/staff',
     name: 'System',
-    meta: { title: '系统管理', icon: 'el-icon-s-tools', roles: ['Admin', 'Boss'] },
+    meta: { title: '系统管理', icon: 'el-icon-s-tools', roles: ['Admin', 'Boss', 'Clerk'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -217,6 +217,30 @@ export const asyncRoutes = [
             name: 'StaffList',
             component: () => import('@/views/staff/list'),
             meta: { title: '员工管理', icon: 'el-icon-user-solid', roles: ['Admin', 'Boss'] }
+          }
+        ]
+      },
+      {
+        path: 'customer',
+        name: 'Customer',
+        component: () => import('@/views/customer/index'),
+        children: [
+          {
+            path: 'list',
+            name: 'CustomerList',
+            component: () => import('@/views/customer/list'),
+            meta: { title: '客户管理', icon: 'el-icon-s-custom', roles: ['Admin', 'Boss', 'Clerk'] }
+          },
+          {
+            path: 'detail/:id',
+            name: 'CustomerDetail',
+            component: () => import('@/views/customer/detail'),
+            hidden: true,
+            meta: {
+              title: '客户详情',
+              activeMenu: '/system/customer/list',
+              roles: ['Admin', 'Boss']
+            }
           }
         ]
       }
