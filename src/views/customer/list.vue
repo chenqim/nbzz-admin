@@ -8,7 +8,7 @@
         :loading="exporting"
         @click="exportExcel"
       >导出客户</el-button>
-      <el-button
+      <!-- <el-button
         v-if="hasAdminBossPermission"
         icon="el-icon-download"
         :loading="importing"
@@ -20,7 +20,7 @@
         accept=".xlsx,.xls"
         class="hidden-import-input"
         @change="onImportFileChange"
-      >
+      > -->
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="客户名称">
           <el-input v-model="queryForm.customerName" clearable placeholder="请输入客户名称" />

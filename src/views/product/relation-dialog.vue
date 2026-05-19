@@ -24,7 +24,7 @@
       <el-form-item label="系数" prop="wageCoefficient">
         <el-input-number
           v-model="model.wageCoefficient"
-          :precision="2"
+          :precision="3"
           :step="0.1"
           :min="0"
           :max="99.99"
@@ -51,7 +51,7 @@ import { createCustomerRelation, updateCustomerRelation } from '@/api/product'
 
 const emptyModel = () => ({
   customerId: '',
-  wageCoefficient: 1,
+  wageCoefficient: 0.5,
   remark: ''
 })
 
@@ -103,7 +103,7 @@ export default {
       this.isEdit = true
       this.relationId = row.id
       this.productId = productId
-      this.originalWageCoefficient = row.wageCoefficient ?? 1
+      this.originalWageCoefficient = row.wageCoefficient ?? 0.5
       this.model = {
         customerId: row.customerId,
         wageCoefficient: this.originalWageCoefficient,
