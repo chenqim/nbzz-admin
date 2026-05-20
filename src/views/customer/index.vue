@@ -1,5 +1,7 @@
 <template>
-  <router-view />
+  <keep-alive include="CustomerList">
+    <router-view />
+  </keep-alive>
 </template>
 
 <script>
