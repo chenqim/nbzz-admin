@@ -15,12 +15,14 @@
       <el-descriptions-item label="工单状态">
         <el-tag :type="config.statusTypeMap[ins.status]">{{ config.statusMap[ins.status] }}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }} [ {{ ins.productInfo?.code }} ]</el-descriptions-item>
+      <!-- <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }} [ {{ ins.productInfo?.code }} ]</el-descriptions-item> -->
+      <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }}<span class="procedure-card__code ml-4">{{ ins.productInfo?.code }}</span></el-descriptions-item>
       <el-descriptions-item label="完成数量 / 生产数量">{{ ins.completeCount }} / {{ ins.count }}</el-descriptions-item>
       <el-descriptions-item label="执行日期">{{ ins.execDate }}</el-descriptions-item>
       <el-descriptions-item label="需求日期">{{ ins.needDate }}</el-descriptions-item>
       <el-descriptions-item label="备注">{{ ins.remark || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报废数量">{{ ins.scrapCount || 0 }}</el-descriptions-item>
+      <!-- 之前没填写过的默认都展示成快递发货的 -->
       <el-descriptions-item label="发货类型">{{ config.trackingTypeMap[ins.trackingType] || ins.trackingType || config.trackingTypeMap['3'] }}</el-descriptions-item>
       <el-descriptions-item :label="dateLabel">{{ ins.deliveryDate || '-' }}</el-descriptions-item>
       <el-descriptions-item :label="numberLabel">{{ ins.trackingNumber || '-' }}</el-descriptions-item>
@@ -42,6 +44,14 @@
           <div class="procedure-card__row">
             <dt>认领时间</dt>
             <dd>{{ p.startTime || '-' }}</dd>
+          </div>
+          <div class="procedure-card__row">
+            <dt>完工时间</dt>
+            <dd>{{ p.endTime || '-' }}</dd>
+          </div>
+          <div class="procedure-card__row">
+            <dt>耗时</dt>
+            <dd>{{ formatProcedureDuration(p.startTime, p.endTime) }}</dd>
           </div>
           <div class="procedure-card__row">
             <dt>完成情况</dt>
@@ -81,6 +91,7 @@ export default {
     }
   },
   computed: {
+    // 之前没填写过的默认都展示成快递发货的
     dateLabel() {
       return this.ins.trackingType === '1' ? '自提日期' : this.ins.trackingType === '2' ? '送货日期' : '发货日期'
     },
@@ -109,6 +120,29 @@ export default {
       } else {
         this.$router.push({ name: 'WorkOrderList' })
       }
+    },
+    formatProcedureDuration(startTime, endTime) {
+      if (!startTime || !endTime) {
+        return '-'
+      }
+      const start = new Date(String(startTime).replace(/-/g, '/')).getTime()
+      const end = new Date(String(endTime).replace(/-/g, '/')).getTime()
+      if (Number.isNaN(start) || Number.isNaN(end) || end < start) {
+        return '-'
+      }
+      let totalSeconds = Math.floor((end - start) / 1000)
+      const days = Math.floor(totalSeconds / 86400)
+      totalSeconds %= 86400
+      const hours = Math.floor(totalSeconds / 3600)
+      totalSeconds %= 3600
+      const minutes = Math.floor(totalSeconds / 60)
+      const seconds = totalSeconds % 60
+      const parts = []
+      if (days > 0) parts.push(`${days}天`)
+      if (hours > 0) parts.push(`${hours}小时`)
+      if (minutes > 0) parts.push(`${minutes}分`)
+      if (seconds > 0 || parts.length === 0) parts.push(`${seconds}秒`)
+      return parts.join('')
     }
   }
 }
