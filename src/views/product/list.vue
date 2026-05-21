@@ -3,6 +3,9 @@
     <div class="search-panel">
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
       <el-form inline :model="queryForm" class="mt-4">
+        <el-form-item label="ID">
+          <el-input v-model="queryForm.id" clearable />
+        </el-form-item>
         <el-form-item label="产品编号">
           <el-input v-model="queryForm.code" clearable />
         </el-form-item>
@@ -27,12 +30,17 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
+        <el-table-column label="ID" min-width="200">
+          <template v-slot="{ row }">
+            <copy-text :value="row.id" />
+          </template>
+        </el-table-column>
         <el-table-column label="产品编号" prop="code" min-width="180" />
-        <el-table-column label="产品名称" prop="name" min-width="180" />
-        <el-table-column label="产品类别" prop="productCategory.name" min-width="180" />
-        <el-table-column label="产品" prop="mainName" min-width="180" />
-        <el-table-column label="规格型号" prop="spec" min-width="180" />
-        <el-table-column label="状态" min-width="180">
+        <el-table-column label="产品名称" prop="name" min-width="180" show-overflow-tooltip />
+        <el-table-column label="产品类别" prop="productCategory.name" min-width="100" />
+        <el-table-column label="产品" prop="mainName" min-width="100" />
+        <el-table-column label="规格型号" prop="spec" min-width="180" show-overflow-tooltip />
+        <el-table-column label="状态" min-width="100">
           <template v-slot="{ row }">
             <el-tag :type="statusTypeMap[row.status]">{{ statusMap[row.status] }}</el-tag>
           </template>
@@ -75,6 +83,7 @@ export default {
   data() {
     return {
       queryForm: {
+        id: '',
         code: '',
         name: '',
         category: '',
@@ -119,6 +128,7 @@ export default {
       this.loading = true
       getProductPage({
         queryParam: {
+          id: this.queryForm.id || undefined,
           code: this.queryForm.code || undefined,
           name: this.queryForm.name || undefined,
           productCategoryId: this.queryForm.category || undefined,
@@ -140,6 +150,7 @@ export default {
     },
     reset() {
       this.queryForm = {
+        id: '',
         code: '',
         name: '',
         category: ''

@@ -22,6 +22,9 @@
         @change="onImportFileChange"
       > -->
       <el-form inline :model="queryForm" class="mt-4">
+        <el-form-item label="ID">
+          <el-input v-model="queryForm.id" clearable placeholder="请输入ID" />
+        </el-form-item>
         <el-form-item label="客户名称">
           <el-input v-model="queryForm.customerName" clearable placeholder="请输入客户名称" />
         </el-form-item>
@@ -73,7 +76,11 @@
     </div>
     <div class="list-panel">
       <el-table v-loading="loading" :data="tableData">
-        <el-table-column label="ID" prop="id" min-width="160" show-overflow-tooltip />
+        <el-table-column label="ID" min-width="180">
+          <template v-slot="{ row }">
+            <copy-text :value="row.id" />
+          </template>
+        </el-table-column>
         <el-table-column label="客户名称" prop="customerName" min-width="140" show-overflow-tooltip />
         <el-table-column label="客户类型" prop="customerType" min-width="110" show-overflow-tooltip />
         <el-table-column label="客户来源" prop="customerSource" min-width="110" show-overflow-tooltip />
@@ -145,6 +152,7 @@ export default {
     return {
       optionLists: OPTION_LISTS,
       queryForm: {
+        id: '',
         customerName: '',
         customerType: '',
         customerSource: '',
@@ -179,6 +187,7 @@ export default {
     },
     buildListQueryBody() {
       return {
+        id: this.queryForm.id || undefined,
         customerName: this.queryForm.customerName || undefined,
         customerType: this.queryForm.customerType || undefined,
         customerSource: this.queryForm.customerSource || undefined,
@@ -211,6 +220,7 @@ export default {
     },
     reset() {
       this.queryForm = {
+        id: '',
         customerName: '',
         customerType: '',
         customerSource: '',
