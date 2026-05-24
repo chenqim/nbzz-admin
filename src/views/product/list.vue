@@ -2,6 +2,18 @@
   <div class="app-container">
     <div class="search-panel">
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
+      <el-button
+        icon="el-icon-download"
+        :loading="importing"
+        @click="triggerImport"
+      >导入关联关系</el-button>
+      <input
+        ref="importFileRef"
+        type="file"
+        accept=".xlsx,.xls"
+        class="hidden-import-input"
+        @change="onImportFileChange"
+      >
       <el-form inline :model="queryForm" class="mt-4">
         <el-form-item label="ID">
           <el-input v-model="queryForm.id" clearable />
@@ -71,9 +83,16 @@
 </template>
 
 <script>
-import { getProductPage, deleteProduct, queryMainNameList } from '@/api/product'
+import * as XLSX from 'xlsx'
+import { getProductPage, deleteProduct, queryMainNameList, createCustomerRelation } from '@/api/product'
 import { getCategoryList } from '@/api/category'
 import Create from './create'
+
+const IMPORT_COLUMN_MAP = {
+  customerId: 'customerID',
+  productId: 'productID',
+  wageCoefficient: 'coefficient'
+}
 
 export default {
   name: 'ProductList',
@@ -90,6 +109,7 @@ export default {
         mainName: ''
       },
       loading: false,
+      importing: false,
       tableData: [],
       pageConfig: {
         page: 1,
@@ -161,6 +181,95 @@ export default {
     create() {
       this.$refs.createRef.open()
     },
+    triggerImport() {
+      if (this.importing) return
+      this.$refs.importFileRef.value = ''
+      this.$refs.importFileRef.click()
+    },
+    parseImportRows(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          try {
+            const workbook = XLSX.read(e.target.result, { type: 'array' })
+            const sheetName = workbook.SheetNames[0]
+            if (!sheetName) {
+              resolve([])
+              return
+            }
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' })
+            resolve(rows)
+          } catch (err) {
+            reject(err)
+          }
+        }
+        reader.onerror = () => reject(new Error('读取文件失败'))
+        reader.readAsArrayBuffer(file)
+      })
+    },
+    rowToRelationPayload(row) {
+      const payload = {}
+      Object.keys(IMPORT_COLUMN_MAP).forEach((key) => {
+        const col = IMPORT_COLUMN_MAP[key]
+        const val = row[col]
+        payload[key] = val === null || val === undefined ? '' : String(val).trim()
+      })
+      return payload
+    },
+    async onImportFileChange(e) {
+      const file = e.target.files && e.target.files[0]
+      e.target.value = ''
+      if (!file) return
+      if (!/\.xlsx?$/i.test(file.name)) {
+        this.$message.warning('请选择 .xlsx 或 .xls 文件')
+        return
+      }
+      let rows
+      try {
+        rows = await this.parseImportRows(file)
+      } catch (err) {
+        console.log(err)
+        this.$message.error('解析 Excel 失败，请检查文件格式')
+        return
+      }
+      const payloads = rows
+        .map((row) => this.rowToRelationPayload(row))
+        .filter((p) => p.customerId && p.productId)
+      if (!payloads.length) {
+        this.$message.warning('未找到可导入的数据（需包含 customerID 与 productID）')
+        return
+      }
+      try {
+        await this.$confirm(
+          `共解析到 ${payloads.length} 条关联关系，确认导入？`,
+          '导入产品与客户关联关系',
+          { type: 'warning' }
+        )
+      } catch {
+        return
+      }
+      this.importing = true
+      let success = 0
+      let failed = 0
+      try {
+        for (const payload of payloads) {
+          try {
+            await createCustomerRelation(payload)
+            success += 1
+          } catch (err) {
+            failed += 1
+            console.log('import relation failed:', payload, err)
+          }
+        }
+        if (failed === 0) {
+          this.$message.success(`导入完成，成功 ${success} 条`)
+        } else {
+          this.$message.warning(`导入完成：成功 ${success} 条，失败 ${failed} 条`)
+        }
+      } finally {
+        this.importing = false
+      }
+    },
     detail(row) {
       this.$router.push({ name: 'ProductDetail', params: { id: row.id }})
     },
@@ -196,4 +305,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.hidden-import-input {
+  display: none;
+}
+</style>
