@@ -3,10 +3,15 @@
     <div class="search-panel">
       <el-button icon="el-icon-plus" type="primary" @click="create">创建</el-button>
       <el-button
+        icon="el-icon-upload2"
+        :loading="exporting"
+        @click="exportExcel"
+      >导出产品</el-button>
+      <!-- <el-button
         icon="el-icon-download"
         :loading="importing"
         @click="triggerImport"
-      >导入关联关系</el-button>
+      >导入关联关系</el-button> -->
       <input
         ref="importFileRef"
         type="file"
@@ -84,14 +89,17 @@
 
 <script>
 import * as XLSX from 'xlsx'
-import { getProductPage, deleteProduct, queryMainNameList, createCustomerRelation } from '@/api/product'
+import dayjs from 'dayjs'
+import { getProductPage, deleteProduct, queryMainNameList, createCustomerRelation, exportProductExcel } from '@/api/product'
 import { getCategoryList } from '@/api/category'
 import Create from './create'
 
 const IMPORT_COLUMN_MAP = {
   customerId: 'customerID',
   productId: 'productID',
-  wageCoefficient: 'coefficient'
+  repairToolCoefficient: 'repairCoefficient'
+  // newToolCoefficient: 'newCoefficient',
+  // reworkCoefficient: 'reworkCoefficient'
 }
 
 export default {
@@ -109,6 +117,7 @@ export default {
         mainName: ''
       },
       loading: false,
+      exporting: false,
       importing: false,
       tableData: [],
       pageConfig: {
@@ -144,15 +153,20 @@ export default {
         this.mainNameList = res.data
       })
     },
+    buildListQueryBody() {
+      return {
+        id: this.queryForm.id || undefined,
+        code: this.queryForm.code || undefined,
+        name: this.queryForm.name || undefined,
+        productCategoryId: this.queryForm.category || undefined,
+        mainName: this.queryForm.mainName || undefined
+      }
+    },
     getList() {
       this.loading = true
       getProductPage({
         queryParam: {
-          id: this.queryForm.id || undefined,
-          code: this.queryForm.code || undefined,
-          name: this.queryForm.name || undefined,
-          productCategoryId: this.queryForm.category || undefined,
-          mainName: this.queryForm.mainName || undefined
+          ...this.buildListQueryBody()
         },
         pageParam: {
           page: this.pageConfig.page,
@@ -296,6 +310,41 @@ export default {
     sizeChange(v) {
       this.pageConfig.size = v
       this.query()
+    },
+    async exportExcel() {
+      this.exporting = true
+      try {
+        // 按参数导出后端没实现，暂时导出全量
+        const res = await exportProductExcel(this.buildListQueryBody())
+        const blob = res.data
+        if (blob.type && blob.type.includes('application/json')) {
+          const text = await blob.text()
+          const json = JSON.parse(text)
+          this.$message.error(json.message || '导出失败')
+          return
+        }
+        const disposition = res.headers['content-disposition']
+        let filename = `产品导出_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`
+        if (disposition) {
+          const match = /filename\*?=(?:UTF-8'')?([^;\n]+)/i.exec(disposition)
+          if (match && match[1]) {
+            filename = decodeURIComponent(match[1].replace(/['"]/g, '').trim())
+          }
+        }
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+        this.$message.success('导出成功')
+      } catch (e) {
+        console.log(e)
+      } finally {
+        this.exporting = false
+      }
     },
     pageChange(v) {
       this.pageConfig.page = v

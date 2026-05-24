@@ -99,3 +99,13 @@ export function updateCustomerRelation(data) {
     data
   })
 }
+
+/** 导出产品 Excel */
+export function exportProductExcel(data) {
+  return request({
+    url: '/productInfo/exportExcel',
+    method: 'post',
+    data,
+    responseType: 'blob'
+  })
+}

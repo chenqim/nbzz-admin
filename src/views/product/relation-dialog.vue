@@ -21,13 +21,24 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="系数" prop="wageCoefficient">
+      <el-form-item label="新刀系数" prop="newToolCoefficient">
         <el-input-number
-          v-model="model.wageCoefficient"
+          v-model="model.newToolCoefficient"
           :precision="3"
           :step="0.1"
           :min="0"
-          :max="99.99"
+          :max="99.999"
+          controls-position="right"
+          class="w-full"
+        />
+      </el-form-item>
+      <el-form-item label="修刀系数" prop="repairToolCoefficient">
+        <el-input-number
+          v-model="model.repairToolCoefficient"
+          :precision="3"
+          :step="0.1"
+          :min="0"
+          :max="99.999"
           controls-position="right"
           class="w-full"
         />
@@ -51,7 +62,8 @@ import { createCustomerRelation, updateCustomerRelation } from '@/api/product'
 
 const emptyModel = () => ({
   customerId: '',
-  wageCoefficient: 0.5,
+  newToolCoefficient: 0.5,
+  repairToolCoefficient: 0.5,
   remark: ''
 })
 
@@ -65,7 +77,8 @@ export default {
       isEdit: false,
       relationId: null,
       productId: null,
-      originalWageCoefficient: null,
+      oriNewToolCoefficient: null,
+      oriRepairToolCoefficient: null,
       customerList: [],
       model: emptyModel()
     }
@@ -73,7 +86,8 @@ export default {
   computed: {
     rules() {
       const base = {
-        wageCoefficient: [{ required: true, message: '请输入系数', trigger: ['blur', 'change'] }]
+        newToolCoefficient: [{ required: true, message: '请输入新刀系数', trigger: ['blur', 'change'] }],
+        repairToolCoefficient: [{ required: true, message: '请输入修刀系数', trigger: ['blur', 'change'] }]
       }
       if (!this.isEdit) {
         base.customerId = [{ required: true, message: '请选择客户', trigger: ['change'] }]
@@ -91,7 +105,8 @@ export default {
       this.isEdit = false
       this.relationId = null
       this.productId = productId
-      this.originalWageCoefficient = null
+      this.oriNewToolCoefficient = null
+      this.oriRepairToolCoefficient = null
       this.model = emptyModel()
       this.loadCustomerList()
       this.dialogVisible = true
@@ -103,10 +118,12 @@ export default {
       this.isEdit = true
       this.relationId = row.id
       this.productId = productId
-      this.originalWageCoefficient = row.wageCoefficient ?? 0.5
+      this.oriNewToolCoefficient = row.newToolCoefficient ?? 0.5
+      this.oriRepairToolCoefficient = row.repairToolCoefficient ?? 0.5
       this.model = {
         customerId: row.customerId,
-        wageCoefficient: this.originalWageCoefficient,
+        newToolCoefficient: this.oriNewToolCoefficient,
+        repairToolCoefficient: this.oriRepairToolCoefficient,
         remark: row.remark || ''
       }
       this.dialogVisible = true
@@ -131,7 +148,8 @@ export default {
           customerId: this.model.customerId,
           productId: this.productId,
           remark: this.model.remark,
-          wageCoefficient: this.model.wageCoefficient
+          newToolCoefficient: this.model.newToolCoefficient,
+          repairToolCoefficient: this.model.repairToolCoefficient
         })
         this.$message.success('添加成功')
         this.close()
@@ -149,8 +167,11 @@ export default {
           id: this.relationId,
           remark: this.model.remark
         }
-        if (Number(this.model.wageCoefficient) !== Number(this.originalWageCoefficient)) {
-          payload.wageCoefficient = this.model.wageCoefficient
+        if (Number(this.model.newToolCoefficient) !== Number(this.oriNewToolCoefficient)) {
+          payload.newToolCoefficient = this.model.newToolCoefficient
+        }
+        if (Number(this.model.repairToolCoefficient) !== Number(this.oriRepairToolCoefficient)) {
+          payload.repairToolCoefficient = this.model.repairToolCoefficient
         }
         await updateCustomerRelation(payload)
         this.$message.success('修改成功')
@@ -165,7 +186,8 @@ export default {
     close() {
       this.dialogVisible = false
       this.loading = false
-      this.originalWageCoefficient = null
+      this.oriNewToolCoefficient = null
+      this.oriRepairToolCoefficient = null
       this.model = emptyModel()
       this.$refs.model?.resetFields()
     }

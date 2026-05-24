@@ -25,7 +25,8 @@
     </div>
     <el-table v-loading="relationLoading" :data="tableData" border stripe>
       <el-table-column label="客户名称" prop="customerName" min-width="140" show-overflow-tooltip />
-      <el-table-column label="系数" prop="wageCoefficient" min-width="100" />
+      <el-table-column label="新刀系数" prop="newToolCoefficient" min-width="100" />
+      <el-table-column label="修刀系数" prop="repairToolCoefficient" min-width="100" />
       <el-table-column label="系数上一次更新时间" prop="coefficientChangeTime" show-overflow-tooltip />
       <el-table-column label="备注" prop="remark" min-width="160" show-overflow-tooltip>
         <template v-slot="{ row }">{{ row.remark || '-' }}</template>
