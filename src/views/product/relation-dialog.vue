@@ -43,6 +43,17 @@
           class="w-full"
         />
       </el-form-item>
+      <el-form-item label="返工系数" prop="reworkCoefficient">
+        <el-input-number
+          v-model="model.reworkCoefficient"
+          :precision="3"
+          :step="0.1"
+          :min="0"
+          :max="99.999"
+          controls-position="right"
+          class="w-full"
+        />
+      </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="model.remark" type="textarea" :rows="3" resize="none" />
       </el-form-item>
@@ -63,6 +74,7 @@ import { createCustomerRelation, updateCustomerRelation } from '@/api/product'
 const emptyModel = () => ({
   customerId: '',
   newToolCoefficient: 0.5,
+  reworkCoefficient: 0.5,
   repairToolCoefficient: 0.5,
   remark: ''
 })
@@ -87,6 +99,7 @@ export default {
     rules() {
       const base = {
         newToolCoefficient: [{ required: true, message: '请输入新刀系数', trigger: ['blur', 'change'] }],
+        reworkCoefficient: [{ required: true, message: '请输入返工系数', trigger: ['blur', 'change'] }],
         repairToolCoefficient: [{ required: true, message: '请输入修刀系数', trigger: ['blur', 'change'] }]
       }
       if (!this.isEdit) {
@@ -106,6 +119,7 @@ export default {
       this.relationId = null
       this.productId = productId
       this.oriNewToolCoefficient = null
+      this.oriReworkCoefficient = null
       this.oriRepairToolCoefficient = null
       this.model = emptyModel()
       this.loadCustomerList()
@@ -119,10 +133,12 @@ export default {
       this.relationId = row.id
       this.productId = productId
       this.oriNewToolCoefficient = row.newToolCoefficient ?? 0.5
+      this.oriReworkCoefficient = row.reworkCoefficient ?? 0.5
       this.oriRepairToolCoefficient = row.repairToolCoefficient ?? 0.5
       this.model = {
         customerId: row.customerId,
         newToolCoefficient: this.oriNewToolCoefficient,
+        reworkCoefficient: this.oriReworkCoefficient,
         repairToolCoefficient: this.oriRepairToolCoefficient,
         remark: row.remark || ''
       }
@@ -149,6 +165,7 @@ export default {
           productId: this.productId,
           remark: this.model.remark,
           newToolCoefficient: this.model.newToolCoefficient,
+          reworkCoefficient: this.model.reworkCoefficient,
           repairToolCoefficient: this.model.repairToolCoefficient
         })
         this.$message.success('添加成功')
@@ -170,6 +187,9 @@ export default {
         if (Number(this.model.newToolCoefficient) !== Number(this.oriNewToolCoefficient)) {
           payload.newToolCoefficient = this.model.newToolCoefficient
         }
+        if (Number(this.model.reworkCoefficient) !== Number(this.oriReworkCoefficient)) {
+          payload.reworkCoefficient = this.model.reworkCoefficient
+        }
         if (Number(this.model.repairToolCoefficient) !== Number(this.oriRepairToolCoefficient)) {
           payload.repairToolCoefficient = this.model.repairToolCoefficient
         }
@@ -187,6 +207,7 @@ export default {
       this.dialogVisible = false
       this.loading = false
       this.oriNewToolCoefficient = null
+      this.oriReworkCoefficient = null
       this.oriRepairToolCoefficient = null
       this.model = emptyModel()
       this.$refs.model?.resetFields()
