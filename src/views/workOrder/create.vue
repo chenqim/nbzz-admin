@@ -51,6 +51,22 @@
           <el-option v-for="n in productList" :key="n.id" :value="n.id" :label="n.name" />
         </el-select>
       </el-form-item>
+      <el-form-item label="客户" prop="customerId">
+        <el-select v-model="model.customerId" filterable class="w-full" :disabled="isForce" @change="customerChange">
+          <el-option v-for="n in customerList" :key="n.customerId" :value="n.customerId" :label="n.customerName" />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="model.customerId" :label="coefficientLabel">
+        <el-input
+          :value="currentCoefficient != null ? currentCoefficient : '未配置'"
+          disabled
+          class="w-full"
+          :class="{ 'coefficient-warn': !currentCoefficient }"
+        />
+        <div v-if="!currentCoefficient" style="color:#F56C6C;font-size:12px;line-height:1.4;margin-top:4px;">
+          {{ coefficientLabel }}未配置或为0，无法创建/修改工单
+        </div>
+      </el-form-item>
       <el-form-item label="生产数量" prop="count">
         <el-input-number v-model="model.count" :precision="0" :min="1" :max="100000000" class="w-full" />
       </el-form-item>
@@ -81,7 +97,7 @@
 
 <script>
 import config from './config'
-import { getProductList, queryMainNameList } from '@/api/product'
+import { getProductList, queryMainNameList, queryCustomerRelationListByProduct } from '@/api/product'
 import { createWorkOrder, updateWorkOrder, forceUpdateWorkOrder, getWorkOrderDetail, queryWorkingProcedureList, queryWorkOrderNameList } from '@/api/workOrder'
 import { getCategoryList } from '@/api/category'
 
@@ -99,6 +115,7 @@ export default {
         productCategoryId: '',
         productInfoId: '',
         mainName: '',
+        customerId: '',
         count: 1,
         execDate: '',
         needDate: '',
@@ -113,6 +130,7 @@ export default {
         productCategoryId: [{ required: true, message: '请选择产品类别', trigger: ['change'] }],
         mainName: [{ required: true, message: '请选择产品', trigger: ['change'] }],
         productInfoId: [{ required: true, message: '请选择生产产品', trigger: ['change'] }],
+        customerId: [{ required: true, message: '请选择客户', trigger: ['change'] }],
         count: [{ required: true, message: '请输入生产数量', trigger: ['blur', 'change'] }],
         execDate: [{ required: true, message: '请选择执行日期', trigger: ['change'] }],
         needDate: [{ required: true, message: '请选择需求日期', trigger: ['change'] }],
@@ -121,12 +139,39 @@ export default {
       productCategoryList: [],
       productList: [],
       processList: [],
+      customerList: [],
+      selectedCustomerRelation: null,
       config,
       isForce: false,
       mainNameList: []
     }
   },
-  created() {},
+  computed: {
+    coefficientFieldMap() {
+      return {
+        produce: 'newToolCoefficient',
+        maintenance: 'repairToolCoefficient',
+        rework: 'reworkCoefficient'
+      }
+    },
+    coefficientLabelMap() {
+      return {
+        produce: '新刀系数',
+        maintenance: '修刀系数',
+        rework: '返工系数'
+      }
+    },
+    coefficientLabel() {
+      return this.coefficientLabelMap[this.model.type] || '系数'
+    },
+    currentCoefficient() {
+      if (!this.selectedCustomerRelation) return null
+      const field = this.coefficientFieldMap[this.model.type]
+      if (!field) return null
+      const val = this.selectedCustomerRelation[field]
+      return (val === undefined || val === null) ? null : val
+    }
+  },
   methods: {
     getSuggestions() {
       queryWorkOrderNameList({}).then(res => {
@@ -196,12 +241,36 @@ export default {
       this.getProductList(this.model.productCategoryId, v)
     },
     productChange(v) {
-      // const product = this.productList.find(n => n.id === v)
-      // this.getProcessList(product.productCategoryId)
+      this.getCustomerList(v)
+    },
+    customerChange(v) {
+      this.selectedCustomerRelation = this.customerList.find(n => n.customerId === v) || null
+    },
+    getCustomerList(productInfoId, skipReset) {
+      if (!skipReset) {
+        this.model.customerId = ''
+        this.selectedCustomerRelation = null
+      }
+      if (!productInfoId) {
+        this.customerList = []
+        return
+      }
+      queryCustomerRelationListByProduct({ id: productInfoId }).then(res => {
+        this.customerList = Array.isArray(res.data) ? res.data : (res.data?.records || [])
+        // 如果 model.customerId 已经设置（编辑模式 setDefault 先完成），则同步关联对象
+        if (this.model.customerId) {
+          this.selectedCustomerRelation = this.customerList.find(n => n.customerId === this.model.customerId) || null
+        }
+      })
     },
     ok() {
       this.$refs.model.validate((valid) => {
         if (valid) {
+          // 校验系数
+          if (!this.currentCoefficient) {
+            this.$message.error(`${this.coefficientLabel}未配置或为0，无法创建/修改工单`)
+            return
+          }
           if (this.ins) {
             this.update()
           } else {
@@ -255,15 +324,10 @@ export default {
         mainName: this.ins.productInfo?.mainName,
         procedureList: procedureList.map(n => n.workingProcedureId)
       }
-      // this.model.name = this.ins.name
-      // this.model.grade = this.ins.grade
-      // this.model.type = this.ins.type
-      // this.model.productInfoId = this.ins.productInfoId
-      // this.model.count = this.ins.count
-      // this.model.execDate = this.ins.execDate
-      // this.model.needDate = this.ins.needDate
-      // this.model.procedureList = procedureList.map(n => n.workingProcedureId)
-      // this.model.remark = this.ins.remark
+      // 如果客户列表已加载完成，则同步关联对象
+      if (this.model.customerId && this.customerList.length) {
+        this.selectedCustomerRelation = this.customerList.find(n => n.customerId === this.model.customerId) || null
+      }
     },
     async open(ins, isForce) {
       this.ins = ins
@@ -277,6 +341,8 @@ export default {
         this.getMainNameList(ins?.productInfo?.productCategoryId)
         this.getProductList(ins?.productInfo?.productCategoryId, ins?.productInfo?.mainName)
         this.getProcessList(ins?.productInfo?.productCategoryId)
+        // 加载客户列表，skipReset=true 避免覆盖 setDefault 中将要设置的 customerId
+        this.getCustomerList(ins.productInfoId, true)
       }
       this.dialogVisible = true
     },
@@ -286,6 +352,8 @@ export default {
       this.productCategoryList = []
       this.productList = []
       this.processList = []
+      this.customerList = []
+      this.selectedCustomerRelation = null
       this.model = this.$options.data.call(this).model
       this.$refs.model.resetFields()
     }
@@ -296,5 +364,8 @@ export default {
 <style lang="scss" scoped>
 .w-full {
   width: 100% !important;
+}
+:deep(.coefficient-warn .el-input__inner) {
+  color: #F56C6C;
 }
 </style>

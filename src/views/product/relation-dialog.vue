@@ -73,8 +73,8 @@ import { createCustomerRelation, updateCustomerRelation } from '@/api/product'
 
 const emptyModel = () => ({
   customerId: '',
-  newToolCoefficient: 0.5,
-  reworkCoefficient: 0.5,
+  newToolCoefficient: 0,
+  reworkCoefficient: 0,
   repairToolCoefficient: 0.5,
   remark: ''
 })
@@ -132,8 +132,8 @@ export default {
       this.isEdit = true
       this.relationId = row.id
       this.productId = productId
-      this.oriNewToolCoefficient = row.newToolCoefficient ?? 0.5
-      this.oriReworkCoefficient = row.reworkCoefficient ?? 0.5
+      this.oriNewToolCoefficient = row.newToolCoefficient ?? 0
+      this.oriReworkCoefficient = row.reworkCoefficient ?? 0
       this.oriRepairToolCoefficient = row.repairToolCoefficient ?? 0.5
       this.model = {
         customerId: row.customerId,
