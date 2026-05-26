@@ -350,6 +350,7 @@ export default {
       this.dialogVisible = false
       this.loading = false
       this.productCategoryList = []
+      this.mainNameList = []
       this.productList = []
       this.processList = []
       this.customerList = []
