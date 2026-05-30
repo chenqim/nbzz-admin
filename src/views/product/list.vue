@@ -7,11 +7,11 @@
         :loading="exporting"
         @click="exportExcel"
       >导出产品</el-button>
-      <el-button
+      <!-- <el-button
         icon="el-icon-download"
         :loading="importing"
         @click="triggerImport"
-      >导入关联关系</el-button>
+      >导入关联关系</el-button> -->
       <input
         ref="importFileRef"
         type="file"

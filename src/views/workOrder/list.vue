@@ -191,6 +191,7 @@
           min-width="150"
           show-overflow-tooltip
         />
+        <el-table-column label="发货方式" prop="deliveryAttr" min-width="100" />
         <el-table-column label="创建时间" prop="createTime" min-width="150" />
         <el-table-column label="更新时间" prop="updateTime" min-width="150" />
         <el-table-column label="操作" width="240" fixed="right">
@@ -208,11 +209,16 @@
             >删除</el-button>
             <el-button
               type="text"
-              :disabled="row.status !== 'executed'"
+              :disabled="row.status !== 'executed' || row.deliveryAttr === '部分发货'"
               @click="send(row)"
             >发货</el-button>
+            <el-button
+              type="text"
+              :disabled="row.status !== 'executed' || row.deliveryAttr === '全部发货'"
+              @click="partialSend(row)"
+            >部分发货</el-button>
             <el-button type="text" @click="printWorkOrder(row)">打印</el-button>
-            <div v-if="hasPermission">
+            <template v-if="hasPermission">
               <el-button
                 type="text"
                 @click="update(row, true)"
@@ -221,7 +227,7 @@
                 type="text"
                 @click="del(row, true)"
               >强制删除</el-button>
-            </div>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -236,69 +242,8 @@
       </div>
     </div>
     <create ref="createRef" @success="getList" />
-    <el-dialog
-      title="发货"
-      :visible.sync="deliveryDialogVisible"
-      width="480px"
-      append-to-body
-      @close="resetDeliveryForm"
-    >
-      <el-alert
-        title="请确保线下发货后再进行该操作。"
-        type="warning"
-        :closable="false"
-        class="mb-4"
-      />
-      <el-form
-        ref="deliveryFormRef"
-        :model="deliveryForm"
-        :rules="dynamicDeliveryRules"
-        label-width="100px"
-      >
-        <el-form-item label="报废数量" prop="scrapCount">
-          <el-input-number
-            v-model="deliveryForm.scrapCount"
-            :min="0"
-            :max="deliveryRow?.count || 1000000"
-            :precision="0"
-            controls-position="right"
-            class="w-full"
-          />
-        </el-form-item>
-        <el-form-item label="发货类型" prop="trackingType">
-          <el-radio-group v-model="deliveryForm.trackingType">
-            <!-- <el-radio label="1">上门自提</el-radio>
-            <el-radio label="2">送货上门</el-radio>
-            <el-radio label="3">快递发货</el-radio> -->
-            <el-radio v-for="n in Object.keys(config.trackingTypeMap)" :key="n" :label="n">{{ config.trackingTypeMap[n] }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="dateLabel" prop="deliveryDate">
-          <el-date-picker
-            v-model="deliveryForm.deliveryDate"
-            type="date"
-            :placeholder="datePlaceholer"
-            value-format="yyyy-MM-dd"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item :label="numberLabel" prop="trackingNumber">
-          <el-input
-            v-model="deliveryForm.trackingNumber"
-            :placeholder="numberPlaceholder"
-            clearable
-          />
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="deliveryDialogVisible = false">取 消</el-button>
-        <el-button
-          type="primary"
-          :loading="deliverySubmitting"
-          @click="submitDelivery"
-        >确 定</el-button>
-      </span>
-    </el-dialog>
+    <delivery ref="deliveryRef" @success="getList" />
+    <partial-delivery ref="partialDeliveryRef" @success="getList" />
   </div>
 </template>
 
@@ -309,17 +254,20 @@ import {
   getWorkOrderPage,
   exportWorkOrderExcel,
   deleteWorkOrder,
-  forceDeleteWorkOrder,
-  deliveryOrder
+  forceDeleteWorkOrder
 } from '@/api/workOrder'
 import { getStaffList } from '@/api/staff'
 import dayjs from 'dayjs'
 import Create from './create'
+import Delivery from './delivery'
+import PartialDelivery from './partial-delivery'
 
 export default {
   name: 'WorkOrderList',
   components: {
-    Create
+    Create,
+    Delivery,
+    PartialDelivery
   },
   data() {
     return {
@@ -374,23 +322,6 @@ export default {
             }
           }
         ]
-      },
-      deliveryDialogVisible: false,
-      deliverySubmitting: false,
-      deliveryRow: null,
-      deliveryForm: {
-        scrapCount: 0,
-        trackingType: '',
-        deliveryDate: '',
-        trackingNumber: ''
-      },
-      deliveryRules: {
-        scrapCount: [
-          { required: true, message: '请输入报废数量', trigger: 'change' }
-        ],
-        trackingType: [
-          { required: true, message: '请选择发货类型', trigger: 'change' }
-        ]
       }
     }
   },
@@ -398,29 +329,6 @@ export default {
     ...mapGetters(['roles']),
     hasPermission() {
       return this.roles.includes('Admin')
-    },
-    dateLabel() {
-      return this.deliveryForm.trackingType === '3' ? '发货日期' : this.deliveryForm.trackingType === '2' ? '送货日期' : '自提日期'
-    },
-    datePlaceholer() {
-      return this.deliveryForm.trackingType === '3' ? '请选择发货日期' : this.deliveryForm.trackingType === '2' ? '请选择送货日期' : '请选择自提日期'
-    },
-    numberLabel() {
-      return this.deliveryForm.trackingType === '3' ? '快递单号' : this.deliveryForm.trackingType === '2' ? '送货人员' : '自提人员'
-    },
-    numberPlaceholder() {
-      return this.deliveryForm.trackingType === '3' ? '请输入快递单号' : this.deliveryForm.trackingType === '2' ? '请输入送货人员' : '请输入自提人员'
-    },
-    dynamicDeliveryRules() {
-      return {
-        ...this.deliveryRules,
-        deliveryDate: [
-          { required: true, message: this.datePlaceholer, trigger: 'change' }
-        ],
-        trackingNumber: [
-          { required: true, message: this.numberPlaceholder, trigger: 'blur' }
-        ]
-      }
     }
   },
   created() {
@@ -567,52 +475,10 @@ export default {
       }
     },
     send(row) {
-      this.deliveryRow = row
-      this.deliveryForm.scrapCount = 0
-      this.deliveryForm.trackingType = '3'
-      this.deliveryForm.deliveryDate = dayjs().format('YYYY-MM-DD')
-      this.deliveryForm.trackingNumber = ''
-      this.deliveryDialogVisible = true
-      this.$nextTick(() => {
-        this.$refs.deliveryFormRef &&
-          this.$refs.deliveryFormRef.clearValidate()
-      })
+      this.$refs.deliveryRef.open(row)
     },
-    resetDeliveryForm() {
-      this.deliveryRow = null
-      this.deliverySubmitting = false
-      this.$refs.deliveryFormRef && this.$refs.deliveryFormRef.resetFields()
-    },
-    submitDelivery() {
-      if (!this.deliveryRow) return
-      this.$refs.deliveryFormRef.validate(async(valid) => {
-        if (!valid) return
-        const trackingNumber = (this.deliveryForm.trackingNumber || '').trim()
-        if (!trackingNumber) {
-          this.$message.warning('请输入快递单号')
-          return
-        }
-        this.deliverySubmitting = true
-        try {
-          await deliveryOrder({
-            id: this.deliveryRow.id,
-            scrapCount: this.deliveryForm.scrapCount,
-            trackingType: this.deliveryForm.trackingType,
-            deliveryDate: this.deliveryForm.deliveryDate,
-            trackingNumber
-          })
-          this.$message.success({
-            message: '操作成功',
-            type: 'success'
-          })
-          this.deliveryDialogVisible = false
-          this.getList()
-        } catch (error) {
-          console.log(error)
-        } finally {
-          this.deliverySubmitting = false
-        }
-      })
+    partialSend(row) {
+      this.$refs.partialDeliveryRef.open(row)
     },
     detail(row) {
       this.$router.push({

@@ -98,6 +98,22 @@ export function deliveryOrder(data) {
   })
 }
 
+export function partialDeliveryOrder(data) {
+  return request({
+    url: '/workOrder/partialDeliveryOrder',
+    method: 'post',
+    data
+  })
+}
+
+export function queryDeliveryDetail(data) {
+  return request({
+    url: '/workOrder/queryDeliveryDetail',
+    method: 'post',
+    data
+  })
+}
+
 export function queryLatelyByPage(data) {
   return request({
     url: '/workOrder/queryLatelyByPage',

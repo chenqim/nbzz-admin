@@ -20,15 +20,40 @@
       <el-descriptions-item label="完成数量 / 生产数量">{{ ins.completeCount }} / {{ ins.count }}</el-descriptions-item>
       <el-descriptions-item label="执行日期">{{ ins.execDate }}</el-descriptions-item>
       <el-descriptions-item label="需求日期">{{ ins.needDate }}</el-descriptions-item>
-      <el-descriptions-item label="备注">{{ ins.remark || '-' }}</el-descriptions-item>
       <el-descriptions-item label="报废数量">{{ ins.scrapCount || 0 }}</el-descriptions-item>
-      <!-- 之前没填写过的默认都展示成快递发货的 -->
+      <el-descriptions-item label="创建时间">{{ ins.createTime }}</el-descriptions-item>
+      <el-descriptions-item label="更新时间">{{ ins.updateTime }}</el-descriptions-item>
+      <el-descriptions-item label="备注">{{ ins.remark || '-' }}</el-descriptions-item>
+    </el-descriptions>
+
+    <!-- 全部发货 -->
+    <el-descriptions v-if="deliveryList && deliveryList.length === 0 && ins.trackingType" title="发货信息" :column="3" border :label-style="{ width: '180px' }" :content-style="{ minWidth: '180px',maxWidth: '400px' }" style="margin-top: 20px">
       <el-descriptions-item label="发货类型">{{ config.trackingTypeMap[ins.trackingType] || ins.trackingType || config.trackingTypeMap['3'] }}</el-descriptions-item>
       <el-descriptions-item :label="dateLabel">{{ ins.deliveryDate || '-' }}</el-descriptions-item>
       <el-descriptions-item :label="numberLabel">{{ ins.trackingNumber || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="创建时间">{{ ins.createTime }}</el-descriptions-item>
-      <el-descriptions-item label="更新时间">{{ ins.updateTime }}</el-descriptions-item>
     </el-descriptions>
+
+    <!-- 部分发货 -->
+    <template v-if="deliveryList && deliveryList.length > 0">
+      <p class="title">发货信息</p>
+      <el-descriptions
+        v-for="(item, index) in deliveryList"
+        :key="item.id || index"
+        :title="'发货记录 ' + (index + 1)"
+        :column="4"
+        border
+        :label-style="{ width: '180px' }"
+        :content-style="{ minWidth: '180px', maxWidth: '400px' }"
+        class="mb-4 delivery-descriptions"
+      >
+        <el-descriptions-item label="发货数量">{{ item.deliveryCount || 0 }}</el-descriptions-item>
+        <el-descriptions-item label="发货类型">{{ getDeliveryTypeLabel(item.deliveryType) }}</el-descriptions-item>
+        <el-descriptions-item :label="getDeliveryDateLabel(item.deliveryType)">{{ item.deliveryDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="getShipmentNoLabel(item.deliveryType)">{{ item.shipmentNo || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="备注" :span="4">{{ item.remark || '-' }}</el-descriptions-item>
+      </el-descriptions>
+    </template>
+
     <p class="title">工序相关信息</p>
     <div class="procedure-grid">
       <article v-for="p in (ins.procedureList || [])" :key="p.id" class="procedure-card">
@@ -72,7 +97,8 @@
 
 <script>
 import config from './config'
-import { getWorkOrderDetail } from '@/api/workOrder'
+import { getWorkOrderDetail, queryDeliveryDetail } from '@/api/workOrder'
+import dayjs from 'dayjs'
 
 export default {
   name: 'WorkOrderDetail',
@@ -80,6 +106,7 @@ export default {
     return {
       loading: false,
       ins: {},
+      deliveryList: [],
       customColors: [
         { color: '#f56c6c', percentage: 20 },
         { color: '#e6a23c', percentage: 50 },
@@ -104,15 +131,22 @@ export default {
     this.getDetail()
   },
   methods: {
-    getDetail() {
+    async getDetail() {
       this.loading = true
-      getWorkOrderDetail({
-        id: this.$route.params.id
-      }).then(res => {
-        this.ins = res.data
-        console.log(res.data)
+      const id = this.$route.params.id
+      try {
+        const [detailRes, deliveryRes] = await Promise.all([
+          getWorkOrderDetail({ id }),
+          queryDeliveryDetail({ id })
+        ])
+        this.ins = detailRes.data
+        this.deliveryList = deliveryRes.data.sort((a, b) => dayjs(a.createTime).unix() - dayjs(b.createTime).unix()) || []
+      } catch (error) {
+        console.log(error)
+        this.deliveryList = []
+      } finally {
         this.loading = false
-      })
+      }
     },
     goBack() {
       if (this.from === 'dashboard') {
@@ -120,6 +154,15 @@ export default {
       } else {
         this.$router.push({ name: 'WorkOrderList' })
       }
+    },
+    getDeliveryTypeLabel(type) {
+      return config.trackingTypeMap[type] || type || '-'
+    },
+    getDeliveryDateLabel(type) {
+      return type === '1' ? '自提日期' : type === '2' ? '送货日期' : '发货日期'
+    },
+    getShipmentNoLabel(type) {
+      return type === '1' ? '自提人员' : type === '2' ? '送货人员' : '快递单号'
     },
     formatProcedureDuration(startTime, endTime) {
       if (!startTime || !endTime) {
@@ -262,5 +305,9 @@ export default {
 :deep(.el-descriptions-item__content) {
   height: 50px; /* 设置你希望的高度 */
   line-height: 50px; /* 如果需要，可以设置行高使内容垂直居中 */
+}
+:deep(.delivery-descriptions .el-descriptions__title) {
+  font-size: 14px;
+  font-weight: normal;
 }
 </style>
