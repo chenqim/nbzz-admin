@@ -204,7 +204,7 @@
           min-width="150"
           show-overflow-tooltip
         />
-        <el-table-column label="发货方式 / 日期" prop="deliveryAttr" min-width="120">
+        <el-table-column label="发货方式 / 发货日期" prop="deliveryAttr" min-width="140">
           <template v-slot="{ row }">
             <p v-if="row.deliveryAttr">{{ row.deliveryAttr }}</p>
             <p v-else>未发货</p>
@@ -215,38 +215,42 @@
         <el-table-column label="更新时间" prop="updateTime" min-width="150" /> -->
         <el-table-column label="操作" width="240" fixed="right">
           <template v-slot="{ row }">
-            <el-button type="text" @click="detail(row)">详情</el-button>
-            <el-button
-              type="text"
-              :disabled="row.status !== 'create'"
-              @click="update(row)"
-            >修改</el-button>
-            <el-button
-              type="text"
-              :disabled="row.status !== 'create'"
-              @click="del(row)"
-            >删除</el-button>
-            <el-button
-              type="text"
-              :disabled="row.status !== 'executed' || row.deliveryAttr === '部分发货'"
-              @click="send(row)"
-            >发货</el-button>
-            <el-button
-              type="text"
-              :disabled="row.status !== 'executed' || row.deliveryAttr === '全部发货'"
-              @click="partialSend(row)"
-            >部分发货</el-button>
-            <el-button type="text" @click="printWorkOrder(row)">打印</el-button>
-            <template v-if="hasPermission">
+            <div>
+              <el-button type="text" @click="detail(row)">详情</el-button>
               <el-button
                 type="text"
-                @click="update(row, true)"
-              >强制修改</el-button>
+                :disabled="row.status !== 'create'"
+                @click="update(row)"
+              >修改</el-button>
               <el-button
                 type="text"
-                @click="del(row, true)"
-              >强制删除</el-button>
-            </template>
+                :disabled="row.status !== 'create'"
+                @click="del(row)"
+              >删除</el-button>
+              <el-button
+                type="text"
+                :disabled="row.status !== 'executed' || row.deliveryAttr === '部分发货'"
+                @click="send(row)"
+              >发货</el-button>
+              <el-button
+                type="text"
+                :disabled="row.status !== 'executed' || row.deliveryAttr === '全部发货'"
+                @click="partialSend(row)"
+              >部分发货</el-button>
+            </div>
+            <div>
+              <el-button type="text" @click="printWorkOrder(row)">打印</el-button>
+              <template v-if="hasPermission">
+                <el-button
+                  type="text"
+                  @click="update(row, true)"
+                >强制修改</el-button>
+                <el-button
+                  type="text"
+                  @click="del(row, true)"
+                >强制删除</el-button>
+              </template>
+            </div>
           </template>
         </el-table-column>
       </el-table>
