@@ -106,6 +106,19 @@
             value-format="yyyy-MM-dd"
           />
         </el-form-item>
+        <el-form-item label="发货日期">
+          <el-date-picker
+            v-model="queryForm.deliveryDate"
+            type="daterange"
+            align="right"
+            unlink-panels
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerOptions"
+            value-format="yyyy-MM-dd"
+          />
+        </el-form-item>
         <el-form-item label="创建时间">
           <el-date-picker
             v-model="queryForm.createTime"
@@ -184,16 +197,22 @@
               / {{ row.count }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="需求日期" prop="needDate" min-width="90" />
+        <el-table-column label="需求日期" prop="needDate" min-width="100" />
         <el-table-column
           label="备注"
           prop="remark"
           min-width="150"
           show-overflow-tooltip
         />
-        <el-table-column label="发货方式" prop="deliveryAttr" min-width="100" />
-        <el-table-column label="创建时间" prop="createTime" min-width="150" />
-        <el-table-column label="更新时间" prop="updateTime" min-width="150" />
+        <el-table-column label="发货方式 / 日期" prop="deliveryAttr" min-width="120">
+          <template v-slot="{ row }">
+            <p v-if="row.deliveryAttr">{{ row.deliveryAttr }}</p>
+            <p v-else>未发货</p>
+            <p v-if="row.deliveryDate">{{ row.deliveryDate }}</p>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column label="创建时间" prop="createTime" min-width="150" />
+        <el-table-column label="更新时间" prop="updateTime" min-width="150" /> -->
         <el-table-column label="操作" width="240" fixed="right">
           <template v-slot="{ row }">
             <el-button type="text" @click="detail(row)">详情</el-button>
@@ -280,6 +299,7 @@ export default {
         productName: '',
         userId: '',
         needDate: [],
+        deliveryDate: [],
         createTime: []
       },
       userList: [],
@@ -347,6 +367,8 @@ export default {
         userId: this.queryForm.userId || undefined,
         needDateStart: this.queryForm.needDate?.[0] || undefined,
         needDateEnd: this.queryForm.needDate?.[1] || undefined,
+        deliveryDateStart: this.queryForm.deliveryDate?.[0] || undefined,
+        deliveryDateEnd: this.queryForm.deliveryDate?.[1] || undefined,
         createTimeStart: this.queryForm.createTime?.[0] || undefined,
         createTimeEnd: this.queryForm.createTime?.[1] || undefined
       }
@@ -400,6 +422,7 @@ export default {
         productName: '',
         userId: '',
         needDate: [],
+        deliveryDate: [],
         createTime: []
       }
       this.pageConfig.page = 1

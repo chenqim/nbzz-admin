@@ -48,8 +48,8 @@
               v-if="form.deliveryList.length > 1"
               type="text"
               class="delivery-item-remove"
-              @click="removeItem(index)"
               :disabled="!!item.id"
+              @click="removeItem(index)"
             >
               <i class="el-icon-delete" /> 删除
             </el-button>
@@ -175,7 +175,7 @@ export default {
         ],
         scrapCount: [
           { required: true, message: '请输入报废数量', trigger: ['blur', 'change'] }
-        ],
+        ]
       }
     }
   },
