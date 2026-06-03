@@ -17,6 +17,8 @@
       </el-descriptions-item>
       <!-- <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }} [ {{ ins.productInfo?.code }} ]</el-descriptions-item> -->
       <el-descriptions-item label="产品名称">{{ ins.productInfo?.name }}<span class="procedure-card__code ml-4">{{ ins.productInfo?.code }}</span></el-descriptions-item>
+      <el-descriptions-item label="客户名称">{{ customerName || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="系数">{{ coefficientText || '-' }}</el-descriptions-item>
       <el-descriptions-item label="完成数量 / 生产数量">{{ ins.completeCount }} / {{ ins.count }}</el-descriptions-item>
       <el-descriptions-item label="执行日期">{{ ins.execDate }}</el-descriptions-item>
       <el-descriptions-item label="需求日期">{{ ins.needDate }}</el-descriptions-item>
@@ -98,6 +100,8 @@
 <script>
 import config from './config'
 import { getWorkOrderDetail, queryDeliveryDetail } from '@/api/workOrder'
+import { getCustomerDetail } from '@/api/customer'
+import { queryCustomerRelationListByProduct } from '@/api/product'
 import dayjs from 'dayjs'
 
 export default {
@@ -107,6 +111,8 @@ export default {
       loading: false,
       ins: {},
       deliveryList: [],
+      customerName: '',
+      coefficientText: '',
       customColors: [
         { color: '#f56c6c', percentage: 20 },
         { color: '#e6a23c', percentage: 50 },
@@ -141,11 +147,44 @@ export default {
         ])
         this.ins = detailRes.data
         this.deliveryList = deliveryRes.data.sort((a, b) => dayjs(a.createTime).unix() - dayjs(b.createTime).unix()) || []
+        await this.fetchCustomerAndCoefficient()
       } catch (error) {
         console.log(error)
         this.deliveryList = []
       } finally {
         this.loading = false
+      }
+    },
+    async fetchCustomerAndCoefficient() {
+      this.customerName = ''
+      this.coefficientText = ''
+      const customerId = this.ins.customerId
+      const productId = this.ins.productInfo?.id
+      if (!customerId) return
+      try {
+        const customerRes = await getCustomerDetail({ id: customerId })
+        this.customerName = customerRes.data?.customerName || ''
+      } catch (e) {
+        console.log(e)
+      }
+      if (!productId) return
+      try {
+        const relationRes = await queryCustomerRelationListByProduct({ id: productId })
+        const list = relationRes.data || []
+        const match = list.find((item) => item.customerId === customerId)
+        if (match) {
+          const field = config.coefficientFieldMap[this.ins.type]
+          // const label = config.coefficientLabelMap[this.ins.type]
+          if (field /* && label */) {
+            // this.coefficientText = `${label}: ${match[field]}`
+            this.coefficientText = match[field] || '-'
+          } else {
+            // this.coefficientText = Object.keys(config.coefficientFieldMap).map(key => `${config.coefficientLabelMap[key]}: ${match[config.coefficientFieldMap[key]]}`).join(', ')
+            this.coefficientText = '-'
+          }
+        }
+      } catch (e) {
+        console.log(e)
       }
     },
     goBack() {

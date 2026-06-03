@@ -38,4 +38,16 @@ config.trackingTypeMap = {
   3: '快递发货'
 }
 
+config.coefficientFieldMap = {
+  produce: 'newToolCoefficient',
+  maintenance: 'repairToolCoefficient',
+  rework: 'reworkCoefficient'
+}
+
+config.coefficientLabelMap = {
+  produce: '新刀系数',
+  maintenance: '修刀系数',
+  rework: '返工系数'
+}
+
 export default config

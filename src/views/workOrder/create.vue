@@ -147,26 +147,12 @@ export default {
     }
   },
   computed: {
-    coefficientFieldMap() {
-      return {
-        produce: 'newToolCoefficient',
-        maintenance: 'repairToolCoefficient',
-        rework: 'reworkCoefficient'
-      }
-    },
-    coefficientLabelMap() {
-      return {
-        produce: '新刀系数',
-        maintenance: '修刀系数',
-        rework: '返工系数'
-      }
-    },
     coefficientLabel() {
-      return this.coefficientLabelMap[this.model.type] || '系数'
+      return config.coefficientLabelMap[this.model.type] || '系数'
     },
     currentCoefficient() {
       if (!this.selectedCustomerRelation) return null
-      const field = this.coefficientFieldMap[this.model.type]
+      const field = config.coefficientFieldMap[this.model.type]
       if (!field) return null
       const val = this.selectedCustomerRelation[field]
       return (val === undefined || val === null) ? null : val
