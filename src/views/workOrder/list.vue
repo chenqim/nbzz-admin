@@ -234,7 +234,7 @@
               >发货</el-button>
               <el-button
                 type="text"
-                :disabled="row.status !== 'executed' || row.deliveryAttr === '全部发货'"
+                :disabled="row.deliveryAttr === '全部发货'"
                 @click="partialSend(row)"
               >部分发货</el-button>
             </div>
