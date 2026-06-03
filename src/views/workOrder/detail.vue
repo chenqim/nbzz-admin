@@ -30,7 +30,7 @@
 
     <!-- 全部发货 -->
     <el-descriptions v-if="deliveryList && deliveryList.length === 0 && ins.trackingType" title="发货信息" :column="3" border :label-style="{ width: '180px' }" :content-style="{ minWidth: '180px',maxWidth: '400px' }" style="margin-top: 20px">
-      <el-descriptions-item label="发货类型">{{ config.trackingTypeMap[ins.trackingType] || ins.trackingType || config.trackingTypeMap['3'] }}</el-descriptions-item>
+      <el-descriptions-item label="发货类型">{{ config.trackingTypeMap[ins.trackingType] || ins.trackingType }}</el-descriptions-item>
       <el-descriptions-item :label="dateLabel">{{ ins.deliveryDate || '-' }}</el-descriptions-item>
       <el-descriptions-item :label="numberLabel">{{ ins.trackingNumber || '-' }}</el-descriptions-item>
     </el-descriptions>
