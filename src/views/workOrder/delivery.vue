@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-dialog
-      title="发货"
+      title="全部发货"
       :visible.sync="deliveryDialogVisible"
       width="480px"
       append-to-body

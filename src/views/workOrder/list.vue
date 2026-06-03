@@ -119,6 +119,22 @@
             value-format="yyyy-MM-dd"
           />
         </el-form-item>
+        <el-form-item label="发货方式">
+          <el-select
+            v-model="queryForm.deliveryAttr"
+            placeholder="请选择发货方式"
+            clearable
+          >
+            <el-option
+              value="全部发货"
+              label="全部发货"
+            />
+            <el-option
+              value="部分发货"
+              label="部分发货"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="创建时间">
           <el-date-picker
             v-model="queryForm.createTime"
@@ -207,8 +223,9 @@
         <el-table-column label="发货方式 / 发货日期" prop="deliveryAttr" min-width="140">
           <template v-slot="{ row }">
             <p v-if="row.deliveryAttr">{{ row.deliveryAttr }}</p>
-            <p v-else>未发货</p>
+            <p v-else>-</p>
             <p v-if="row.deliveryDate">{{ row.deliveryDate }}</p>
+            <p v-else>-</p>
           </template>
         </el-table-column>
         <!-- <el-table-column label="创建时间" prop="createTime" min-width="150" />
@@ -231,10 +248,10 @@
                 type="text"
                 :disabled="row.status !== 'executed' || row.deliveryAttr === '部分发货'"
                 @click="send(row)"
-              >发货</el-button>
+              >全部发货</el-button>
               <el-button
                 type="text"
-                :disabled="row.deliveryAttr === '全部发货'"
+                :disabled="row.status === 'create' || row.status === 'receive' || row.status === 'completed' || row.deliveryAttr === '全部发货'"
                 @click="partialSend(row)"
               >部分发货</el-button>
             </div>
@@ -304,6 +321,7 @@ export default {
         userId: '',
         needDate: [],
         deliveryDate: [],
+        deliveryAttr: '',
         createTime: []
       },
       userList: [],
@@ -373,6 +391,7 @@ export default {
         needDateEnd: this.queryForm.needDate?.[1] || undefined,
         deliveryDateStart: this.queryForm.deliveryDate?.[0] || undefined,
         deliveryDateEnd: this.queryForm.deliveryDate?.[1] || undefined,
+        deliveryAttr: this.queryForm.deliveryAttr || undefined,
         createTimeStart: this.queryForm.createTime?.[0] || undefined,
         createTimeEnd: this.queryForm.createTime?.[1] || undefined
       }
@@ -427,6 +446,7 @@ export default {
         userId: '',
         needDate: [],
         deliveryDate: [],
+        deliveryAttr: '',
         createTime: []
       }
       this.pageConfig.page = 1
