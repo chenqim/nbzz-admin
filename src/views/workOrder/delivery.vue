@@ -19,6 +19,15 @@
         :rules="dynamicDeliveryRules"
         label-width="100px"
       >
+        <el-form-item label="工单编号">
+          <span>{{ deliveryRow?.code }}</span>
+        </el-form-item>
+        <el-form-item label="工单名称">
+          <span>{{ deliveryRow?.name }}</span>
+        </el-form-item>
+        <el-form-item label="产品名称">
+          <span>{{ deliveryRow?.productInfo?.name }}</span>
+        </el-form-item>
         <el-form-item label="报废数量" prop="scrapCount">
           <el-input-number
             v-model="deliveryForm.scrapCount"

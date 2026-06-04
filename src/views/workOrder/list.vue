@@ -496,11 +496,12 @@ export default {
       try {
         await this.$confirm(
           isForce
-            ? '确定强制删除该工单吗？删除后无法恢复。'
-            : '确定删除该工单吗？删除后无法恢复。',
+            ? `确定强制删除工单【 ${row.code} | ${row.name} 】吗？<br>删除后无法恢复，请谨慎操作。`
+            : `确定删除工单【 ${row.code} | ${row.name} 】吗？<br>删除后无法恢复，请谨慎操作。`,
           '系统提示',
           {
-            type: 'warning'
+            type: 'warning',
+            dangerouslyUseHTMLString: true
           }
         )
         if (isForce) {

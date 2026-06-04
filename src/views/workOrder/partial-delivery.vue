@@ -19,6 +19,15 @@
         :rules="formRules"
         label-width="100px"
       >
+        <el-form-item label="工单编号">
+          <span>{{ row?.code }}</span>
+        </el-form-item>
+        <el-form-item label="工单名称">
+          <span>{{ row?.name }}</span>
+        </el-form-item>
+        <el-form-item label="产品名称">
+          <span>{{ row?.productInfo?.name }}</span>
+        </el-form-item>
         <el-form-item label="全部发货" prop="isAllDelivery">
           <el-radio-group v-model="form.isAllDelivery">
             <el-radio label="1">是</el-radio>
