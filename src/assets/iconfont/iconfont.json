@@ -6,6 +6,20 @@
   "description": "管理端",
   "glyphs": [
     {
+      "icon_id": "5930256",
+      "name": "报表-excel",
+      "font_class": "baobiao",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
+      "icon_id": "13853354",
+      "name": "客户信息",
+      "font_class": "customer",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
       "icon_id": "1111855",
       "name": "投资明细",
       "font_class": "mingxi",

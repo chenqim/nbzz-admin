@@ -78,7 +78,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'WorkOrderList',
             component: () => import('@/views/workOrder/list'),
-            meta: { title: '工单管理', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss', 'Leader', 'Clerk'] }
+            meta: { title: '工单', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss', 'Leader', 'Clerk'] }
           },
           {
             path: 'detail/:id',
@@ -94,32 +94,66 @@ export const asyncRoutes = [
         ]
       },
       {
-        path: 'workDetails',
-        name: 'workDetails',
-        component: () => import('@/views/workOrder/index'),
-        redirect: '/production/workOrder/work-details',
+        path: 'product',
+        name: 'Product',
+        component: () => import('@/views/product/index'),
+        redirect: '/production/product/list',
         children: [
           {
             path: 'list',
-            name: 'WorkDetailsList',
-            component: () => import('@/views/workOrder/work-details'),
-            meta: { title: '明细管理', icon: 'iconfont icon-mingxi', roles: ['Admin', 'Boss'] }
+            name: 'ProductList',
+            component: () => import('@/views/product/list'),
+            meta: { title: '产品', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss', 'Clerk'] }
+          },
+          {
+            path: 'detail/:id',
+            name: 'ProductDetail',
+            component: () => import('@/views/product/detail'),
+            hidden: true,
+            meta: {
+              title: '产品详情',
+              activeMenu: '/production/product/list',
+              roles: ['Admin', 'Boss', 'Clerk']
+            }
           }
         ]
       }
-      // {
-      //   path: 'manufacturing',
-      //   name: 'Manufacturing',
-      //   component: () => import('@/views/manufacturing/index'),
-      //   children: [
-      //     {
-      //       path: 'list',
-      //       name: 'ManufacturingList',
-      //       component: () => import('@/views/manufacturing/list'),
-      //       meta: { title: '制造执行', icon: 'iconfont icon-zhizaozhixing' }
-      //     }
-      //   ]
-      // }
+    ]
+  },
+
+  {
+    path: '/client',
+    component: Layout,
+    // redirect: '/client/customer',
+    name: 'Client',
+    meta: { title: '客户管理', icon: 'el-icon-s-custom', roles: ['Admin', 'Boss', 'Clerk'] },
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: 'customer',
+        name: 'Customer',
+        component: () => import('@/views/customer/index'),
+        redirect: '/client/customer/list',
+        children: [
+          {
+            path: 'list',
+            name: 'CustomerList',
+            component: () => import('@/views/customer/list'),
+            meta: { title: '客户信息', icon: 'iconfont icon-customer', roles: ['Admin', 'Boss', 'Clerk'] }
+          },
+          {
+            path: 'detail/:id',
+            name: 'CustomerDetail',
+            component: () => import('@/views/customer/detail'),
+            hidden: true,
+            meta: {
+              title: '客户详情',
+              activeMenu: '/client/customer/list',
+              roles: ['Admin', 'Boss']
+            }
+          }
+        ]
+      }
     ]
   },
 
@@ -128,13 +162,28 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/factory/product',
     name: 'Factory',
-    meta: { title: '工厂建模', icon: 'iconfont icon-shujujianmo', roles: ['Admin', 'Boss', 'Clerk'] },
+    meta: { title: '工厂管理', icon: 'iconfont icon-shujujianmo', roles: ['Admin', 'Boss', 'Clerk'] },
     redirect: 'noRedirect',
     children: [
+      {
+        path: 'staff',
+        name: 'Staff',
+        component: () => import('@/views/staff/index'),
+        redirect: '/factory/staff/list',
+        children: [
+          {
+            path: 'list',
+            name: 'StaffList',
+            component: () => import('@/views/staff/list'),
+            meta: { title: '员工管理', icon: 'el-icon-user-solid', roles: ['Admin', 'Boss'] }
+          }
+        ]
+      },
       {
         path: 'category',
         name: 'Category',
         component: () => import('@/views/category/index'),
+        redirect: '/factory/category/list',
         children: [
           {
             path: 'list',
@@ -145,34 +194,10 @@ export const asyncRoutes = [
         ]
       },
       {
-        path: 'product',
-        name: 'Product',
-        component: () => import('@/views/product/index'),
-        redirect: '/factory/product/list',
-        children: [
-          {
-            path: 'list',
-            name: 'ProductList',
-            component: () => import('@/views/product/list'),
-            meta: { title: '产品管理', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss', 'Clerk'] }
-          },
-          {
-            path: 'detail/:id',
-            name: 'ProductDetail',
-            component: () => import('@/views/product/detail'),
-            hidden: true,
-            meta: {
-              title: '产品详情',
-              activeMenu: '/factory/product/list',
-              roles: ['Admin', 'Boss', 'Clerk']
-            }
-          }
-        ]
-      },
-      {
         path: 'process',
         name: 'Process',
         component: () => import('@/views/process/index'),
+        redirect: '/factory/process/list',
         children: [
           {
             path: 'list',
@@ -186,6 +211,7 @@ export const asyncRoutes = [
         path: 'stage',
         name: 'Stage',
         component: () => import('@/views/stage/index'),
+        redirect: '/factory/stage/list',
         children: [
           {
             path: 'list',
@@ -199,53 +225,37 @@ export const asyncRoutes = [
   },
 
   {
-    path: '/system',
+    path: '/report',
     component: Layout,
-    // redirect: '/system/staff',
-    name: 'System',
-    meta: { title: '系统管理', icon: 'el-icon-s-tools', roles: ['Admin', 'Boss', 'Clerk'] },
-    redirect: 'noRedirect',
+    name: 'Report',
+    meta: { title: '报表管理', icon: 'iconfont icon-baobiao', roles: ['Admin', 'Boss'] },
     children: [
       {
-        path: 'staff',
-        name: 'Staff',
-        component: () => import('@/views/staff/index'),
-        // meta: { title: '员工管理', icon: 'user' },
+        path: 'workDetails',
+        name: 'workDetails',
+        component: () => import('@/views/workOrder/index'),
+        redirect: '/production/workOrder/list',
         children: [
           {
             path: 'list',
-            name: 'StaffList',
-            component: () => import('@/views/staff/list'),
-            meta: { title: '员工管理', icon: 'el-icon-user-solid', roles: ['Admin', 'Boss'] }
-          }
-        ]
-      },
-      {
-        path: 'customer',
-        name: 'Customer',
-        component: () => import('@/views/customer/index'),
-        children: [
-          {
-            path: 'list',
-            name: 'CustomerList',
-            component: () => import('@/views/customer/list'),
-            meta: { title: '客户管理', icon: 'el-icon-s-custom', roles: ['Admin', 'Boss', 'Clerk'] }
-          },
-          {
-            path: 'detail/:id',
-            name: 'CustomerDetail',
-            component: () => import('@/views/customer/detail'),
-            hidden: true,
-            meta: {
-              title: '客户详情',
-              activeMenu: '/system/customer/list',
-              roles: ['Admin', 'Boss']
-            }
+            name: 'WorkDetailsList',
+            component: () => import('@/views/workOrder/work-details'),
+            meta: { title: '明细管理', icon: 'iconfont icon-mingxi', roles: ['Admin', 'Boss'] }
           }
         ]
       }
     ]
   },
+
+  // {
+  //   path: '/system',
+  //   component: Layout,
+  //   // redirect: '/system/staff',
+  //   name: 'System',
+  //   meta: { title: '系统管理', icon: 'el-icon-s-tools', roles: ['Admin', 'Boss', 'Clerk'] },
+  //   redirect: 'noRedirect',
+  //   children: []
+  // },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

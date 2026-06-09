@@ -1,16 +1,7 @@
 <template>
   <div class="app-container">
     <div style="border: 1px solid #efefef;padding: 16px; border-radius: 5px;">
-      <div class="text-right">
-        <el-date-picker
-          v-model="dateValue"
-          type="date"
-          placeholder="选择日期"
-          value-format="yyyy-MM-dd"
-          @change="getAllData"
-        />
-      </div>
-      <h1 class="title">工单执行总览</h1>
+      <!-- <h1 class="title">工单执行总览</h1>
       <div v-loading="topLoading" class="flex" style="gap: 16px;">
         <el-card v-for="n in list2" :key="n.label" class="w-1/5" :class="n.id ? 'cursor-pointer' : ''" @click.native="openWorkOrderModal(n)">
           <div class="flex">
@@ -23,10 +14,22 @@
             </div>
           </div>
         </el-card>
+      </div> -->
+      <!-- <h1 class="title mt-4">需求达成率总览</h1> -->
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="title" style="margin-bottom: 0;">总览</h1>
+        <div>
+          <el-date-picker
+            v-model="dateValue"
+            type="date"
+            placeholder="选择日期"
+            value-format="yyyy-MM-dd"
+            @change="getAllData"
+          />
+        </div>
       </div>
-      <h1 class="title mt-4">需求达成率总览</h1>
-      <div v-loading="topLoading" class="flex" style="gap: 16px;">
-        <el-card v-for="n in list" :key="n.label" class="w-1/5" :class="n.id ? 'cursor-pointer' : ''" @click.native="openWorkOrderModal(n)">
+      <div v-loading="topLoading" class="flex flex-wrap" style="gap: 12px;">
+        <el-card v-for="n in list" :key="n.label" class="card-col" :class="n.id ? 'cursor-pointer' : ''" @click.native="openWorkOrderModal(n)">
           <div class="flex">
             <div>
               <i class="fz-60 icon-color" :class="n.class" />
@@ -81,8 +84,13 @@
             <span>{{ row.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" />
-        <el-table-column label="需求日期" prop="needDate" min-width="180">
+        <el-table-column label="工单类型" min-width="90">
+          <template v-slot="{ row }">
+            <span>{{ config.typeMap[row.type] }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="产品名称" prop="productInfo.name" min-width="180" show-overflow-tooltip />
+        <el-table-column label="需求日期" prop="needDate" min-width="120">
           <template v-slot="{ row }">
             <span style="font-weight: bold;">{{ row.needDate }}</span>
           </template>
@@ -196,8 +204,8 @@
       width="80%"
     >
       <el-table v-loading="dialogTableLoading" height="478px" :data="dialogTableData">
-        <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
+        <el-table-column type="index" label="序号" width="60" align="center" fixed="left" />
+        <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" fixed="left" show-overflow-tooltip>
           <template v-slot="{ row }">
             <span>{{ row.code }}</span>
             <br>
@@ -225,13 +233,21 @@
             <span><span :style="{ color: row.completeCount === 0 ? '#F56C6C' : row.completeCount === row.completeCount ? '#67C23A' : '#409EFF' }">{{ row.completeCount }}</span> / {{ row.count }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="需求日期" min-width="90">
+        <el-table-column label="需求日期" min-width="100">
           <template v-slot="{ row }">
             <span style="color: red;font-weight: bold;">{{ row.needDate }}</span>
           </template>
         </el-table-column>
         <el-table-column label="备注" prop="remark" min-width="150" show-overflow-tooltip />
-        <el-table-column label="创建时间" prop="createTime" min-width="150" />
+        <el-table-column label="发货方式 / 发货日期" prop="deliveryAttr" min-width="140" fixed="right">
+          <template v-slot="{ row }">
+            <p v-if="row.deliveryAttr">{{ row.deliveryAttr }}</p>
+            <p v-else>-</p>
+            <p v-if="row.deliveryDate">{{ row.deliveryDate }}</p>
+            <p v-else>-</p>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column label="创建时间" prop="createTime" min-width="150" /> -->
         <!-- <el-table-column label="更新时间" prop="updateTime" min-width="150" /> -->
       </el-table>
       <span slot="footer" class="dialog-footer">
@@ -315,29 +331,28 @@ export default {
       Promise.all([
         queryOrderAchieveTotal({
           targetDate: this.dateValue
-        }).then(res => {
-          const { totalOrderCount, completedOrderCount, executedOrderCount, processOrderCount, completedOrderRatio } = res.data
-          this.list = [
-            { label: '今日总工单数 >', value: totalOrderCount, id: 'total', class: 'el-icon-s-platform' },
-            { label: '今日已发货 >', value: completedOrderCount, id: 'delivered', class: 'el-icon-s-promotion' },
-            { label: '今日待发货 >', value: executedOrderCount, id: 'pendingDelivered', class: 'el-icon-s-goods' },
-            { label: '今日未完成 >', value: processOrderCount, id: 'notFinsh', class: 'el-icon-s-release' },
-            { label: '今日需求达成率', value: completedOrderRatio + '%', class: 'el-icon-s-flag' }
-          ]
         }),
         queryProduceExecuteTotal({
           targetDate: this.dateValue
-        }).then(res => {
-          const { totalWorkerCount, totalArtifactCount, totalOrderCount, successArtifactCount, successOrderCount } = res.data
-          this.list2 = [
-            { label: '今日在制工单数 >', value: totalOrderCount, id: 'circle', class: 'el-icon-s-order' },
-            { label: '今日完工工单数 >', value: successOrderCount, id: 'finsh', class: 'el-icon-s-claim' },
-            { label: '今日生产人数', value: totalWorkerCount, class: 'el-icon-s-custom' },
-            { label: '今日在制产品数', value: totalArtifactCount, class: 'el-icon-s-shop' },
-            { label: '今日完工产品数', value: successArtifactCount, class: 'el-icon-s-claim' }
-          ]
         })
-      ]).then(() => {
+      ]).then((result) => {
+        const { totalOrderCount, completedOrderCount, executedOrderCount, processOrderCount, completedOrderRatio } = result[0].data
+        this.list = [
+          { label: '今日总工单数 >', value: totalOrderCount, id: 'total', class: 'el-icon-s-platform' },
+          { label: '今日未完成 >', value: processOrderCount, id: 'notFinsh', class: 'el-icon-s-release' },
+          { label: '今日在制工单数 >', value: result[1].data.totalOrderCount, id: 'circle', class: 'el-icon-s-order' },
+          { label: '今日需求达成率', value: completedOrderRatio + '%', class: 'el-icon-s-flag' },
+          { label: '今日待发货 >', value: executedOrderCount, id: 'pendingDelivered', class: 'el-icon-s-goods' },
+          { label: '今日已发货 >', value: completedOrderCount, id: 'delivered', class: 'el-icon-s-promotion' }
+        ]
+        /* const { totalOrderCount, totalWorkerCount, totalArtifactCount, successArtifactCount, successOrderCount } = result[1].data
+        this.list2 = [
+          { label: '今日在制工单数 >', value: totalOrderCount, id: 'circle', class: 'el-icon-s-order' },
+          { label: '今日完工工单数 >', value: successOrderCount, id: 'finsh', class: 'el-icon-s-claim' },
+          { label: '今日生产人数', value: totalWorkerCount, class: 'el-icon-s-custom' },
+          { label: '今日在制产品数', value: totalArtifactCount, class: 'el-icon-s-shop' },
+          { label: '今日完工产品数', value: successArtifactCount, class: 'el-icon-s-claim' }
+        ] */
         this.topLoading = false
       })
     },
@@ -493,6 +508,9 @@ export default {
 }
 .icon-color {
   color: #409EFF;
+}
+.card-col {
+  width: calc(33.333% - 8px);
 }
 .fz-60 {
   font-size: 60px;
