@@ -89,10 +89,17 @@ export default {
           roleIdList: [this.model.role],
           status: this.model.status
         })
-        this.$message({
-          type: 'success',
-          message: '创建成功'
-        })
+        if (this.ins) {
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          })
+        } else {
+          this.$message({
+            type: 'success',
+            message: '创建成功'
+          })
+        }
         this.close()
         this.$emit('success')
       } catch (error) {
