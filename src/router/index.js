@@ -65,7 +65,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/production/list',
     name: 'Production',
-    meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli', roles: ['Admin', 'Boss', 'Leader', 'Clerk'] },
+    meta: { title: '生产管理', icon: 'iconfont icon-shengchanguanli', roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -78,7 +78,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'WorkOrderList',
             component: () => import('@/views/workOrder/list'),
-            meta: { title: '工单', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss', 'Leader', 'Clerk'] }
+            meta: { title: '工单', icon: 'iconfont icon-gongdan', roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales'] }
           },
           {
             path: 'detail/:id',
@@ -88,7 +88,7 @@ export const asyncRoutes = [
             meta: {
               title: '工单详情',
               activeMenu: '/production/workOrder/list',
-              roles: ['Admin', 'Boss', 'Leader', 'Clerk']
+              roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales']
             }
           }
         ]
@@ -103,7 +103,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'ProductList',
             component: () => import('@/views/product/list'),
-            meta: { title: '产品', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss', 'Clerk'] }
+            meta: { title: '产品', icon: 'iconfont icon-chanpin', roles: ['Admin', 'Boss', 'Clerk', 'Sales'] }
           },
           {
             path: 'detail/:id',
@@ -113,7 +113,7 @@ export const asyncRoutes = [
             meta: {
               title: '产品详情',
               activeMenu: '/production/product/list',
-              roles: ['Admin', 'Boss', 'Clerk']
+              roles: ['Admin', 'Boss', 'Clerk', 'Sales']
             }
           }
         ]
@@ -126,7 +126,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/client/customer',
     name: 'Client',
-    meta: { title: '客户管理', icon: 'el-icon-s-custom', roles: ['Admin', 'Boss', 'Clerk'] },
+    meta: { title: '客户管理', icon: 'el-icon-s-custom', roles: ['Admin', 'Boss', 'Clerk', 'Sales'] },
     redirect: 'noRedirect',
     children: [
       {
@@ -139,7 +139,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'CustomerList',
             component: () => import('@/views/customer/list'),
-            meta: { title: '客户信息', icon: 'iconfont icon-customer', roles: ['Admin', 'Boss', 'Clerk'] }
+            meta: { title: '客户信息', icon: 'iconfont icon-customer', roles: ['Admin', 'Boss', 'Clerk', 'Sales'] }
           },
           {
             path: 'detail/:id',
