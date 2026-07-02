@@ -162,7 +162,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/factory/product',
     name: 'Factory',
-    meta: { title: '工厂管理', icon: 'iconfont icon-shujujianmo', roles: ['Admin', 'Boss', 'Clerk'] },
+    meta: { title: '工厂管理', icon: 'iconfont icon-shujujianmo', roles: ['Admin', 'Boss'] },
     redirect: 'noRedirect',
     children: [
       {

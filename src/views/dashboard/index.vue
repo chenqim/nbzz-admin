@@ -76,6 +76,7 @@
         class="dashboard-lately-order-table"
         :data="tableData"
         :row-class-name="needDateRowClassName"
+        border
       >
         <el-table-column label="工单编号 / 工单名称" prop="name" min-width="160" show-overflow-tooltip>
           <template v-slot="{ row }">

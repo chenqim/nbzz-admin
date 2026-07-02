@@ -5,9 +5,13 @@
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
+      <div class="user-info">
+        <span class="user-name">{{ name }}</span>
+        <span v-if="roleText" class="user-role">{{ roleText }}</span>
+      </div>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img :src="avatar || defaultAvatar" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -42,11 +46,26 @@ export default {
     Breadcrumb,
     Hamburger
   },
+  data() {
+    return {
+      defaultAvatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80'
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
-    ])
+      'avatar',
+      'name',
+      'roles',
+      'roleNames'
+    ]),
+    roleText() {
+      const names = (this.roleNames || []).filter(Boolean)
+      if (names.length) {
+        return names.join(' / ')
+      }
+      return (this.roles || []).join(' / ')
+    }
   },
   methods: {
     toggleSideBar() {
@@ -88,7 +107,8 @@ export default {
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
+    display: flex;
+    align-items: center;
 
     &:focus {
       outline: none;
@@ -112,12 +132,33 @@ export default {
       }
     }
 
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      margin-right: 16px;
+      line-height: 1.4;
+
+      .user-name {
+        font-size: 14px;
+        color: #303133;
+        font-weight: 500;
+      }
+
+      .user-role {
+        font-size: 12px;
+        color: #909399;
+      }
+    }
+
     .avatar-container {
       margin-right: 30px;
 
       .avatar-wrapper {
-        margin-top: 5px;
         position: relative;
+        display: flex;
+        align-items: center;
 
         .user-avatar {
           cursor: pointer;
@@ -130,7 +171,8 @@ export default {
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 50%;
+          transform: translateY(-50%);
           font-size: 12px;
         }
       }
