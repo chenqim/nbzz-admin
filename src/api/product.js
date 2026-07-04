@@ -109,3 +109,47 @@ export function exportProductExcel(data) {
     responseType: 'blob'
   })
 }
+
+/** 获取 OSS 直传签名 */
+export function getOssSignature() {
+  return request({
+    url: '/oss/signature',
+    method: 'get'
+  })
+}
+
+/** 保存产品附件 */
+export function saveProductAttachments(data) {
+  return request({
+    url: '/productInfo/saveProductAttachments',
+    method: 'post',
+    data
+  })
+}
+
+/** 查询产品图纸附件 */
+export function queryProductAttachments(data) {
+  return request({
+    url: '/productInfo/queryProductAttachments',
+    method: 'post',
+    data
+  })
+}
+
+/** 删除产品附件 */
+export function deleteProductAttachment(data) {
+  return request({
+    url: '/productInfo/deleteProductAttachment',
+    method: 'post',
+    data
+  })
+}
+
+/** 生成 OSS 文件临时下载 URL */
+export function generateDownloadUrl(data) {
+  return request({
+    url: '/oss/generate-download-url',
+    method: 'post',
+    data
+  })
+}

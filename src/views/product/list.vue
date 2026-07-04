@@ -65,10 +65,11 @@
         <el-table-column label="备注" prop="remark" min-width="180" />
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="更新时间" prop="updateTime" min-width="180" />
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="280" fixed="right">
           <template v-slot="{ row }">
             <el-button type="text" @click="detail(row)">详情</el-button>
             <el-button type="text" @click="update(row)">修改</el-button>
+            <el-button type="text" @click="openUploadDialog(row)">上传图纸</el-button>
             <el-button type="text" @click="del(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -84,13 +85,74 @@
       </div>
     </div>
     <create ref="createRef" @success="getList" />
+
+    <!-- 上传图纸弹窗 -->
+    <el-dialog
+      title="上传图纸"
+      :visible.sync="uploadDialogVisible"
+      width="500px"
+      :close-on-click-modal="false"
+      @close="onUploadDialogClose"
+    >
+      <el-form ref="uploadFormRef" label-width="80px">
+        <el-form-item v-if="uploadProduct" label="产品编号">
+          {{ uploadProduct.code }}
+        </el-form-item>
+        <el-form-item v-if="uploadProduct" label="产品名称">
+          {{ uploadProduct.name }}
+        </el-form-item>
+        <el-form-item label="图纸">
+          <el-upload
+            ref="uploadRef"
+            action="#"
+            :auto-upload="false"
+            :file-list="uploadFileList"
+            :on-change="onUploadFileChange"
+            :on-remove="onUploadFileRemove"
+            :before-upload="beforeUpload"
+            multiple
+          >
+            <el-button size="small" type="primary" icon="el-icon-upload2">选择文件</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传 pdf/jpg/png 文件，且不超过 10MB</div>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <!-- <div v-if="uploadProduct" class="upload-product-info">
+        <p>产品编号：<b>{{ uploadProduct.code }}</b></p>
+        <p>产品名称：<b>{{ uploadProduct.name }}</b></p>
+      </div> -->
+      <!-- <el-upload
+        ref="uploadRef"
+        action="#"
+        :auto-upload="false"
+        :file-list="uploadFileList"
+        :on-change="onUploadFileChange"
+        :on-remove="onUploadFileRemove"
+        :before-upload="beforeUpload"
+        multiple
+      >
+        <el-button size="small" type="primary" icon="el-icon-upload2">选择文件</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传 pdf/jpg/png 文件，且不超过 10MB</div>
+      </el-upload> -->
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="uploadDialogVisible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          :loading="uploading"
+          :disabled="!uploadFileList.length"
+          @click="handleUpload"
+        >
+          {{ uploading ? '上传中...' : '开始上传' }}
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import * as XLSX from 'xlsx'
 import dayjs from 'dayjs'
-import { getProductPage, deleteProduct, queryMainNameList, createCustomerRelation, exportProductExcel } from '@/api/product'
+import { getProductPage, deleteProduct, queryMainNameList, createCustomerRelation, exportProductExcel, getOssSignature, saveProductAttachments } from '@/api/product'
 import { getCategoryList } from '@/api/category'
 import Create from './create'
 
@@ -134,7 +196,12 @@ export default {
         disable: 'danger'
       },
       categoryList: [],
-      mainNameList: []
+      mainNameList: [],
+      // 上传图纸
+      uploadDialogVisible: false,
+      uploadProduct: null,
+      uploadFileList: [],
+      uploading: false
     }
   },
   created() {
@@ -284,6 +351,107 @@ export default {
         this.importing = false
       }
     },
+    openUploadDialog(row) {
+      this.uploadProduct = row
+      this.uploadFileList = []
+      this.uploadDialogVisible = true
+    },
+    onUploadDialogClose() {
+      this.uploadProduct = null
+      this.uploadFileList = []
+    },
+    beforeUpload(file) {
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png']
+      const isAllowed = allowedTypes.includes(file.type)
+      const isLt10M = file.size / 1024 / 1024 < 10
+      if (!isAllowed) {
+        this.$message.error('只能上传 pdf/jpg/png 格式的文件')
+        return false
+      }
+      if (!isLt10M) {
+        this.$message.error('文件大小不能超过 10MB')
+        return false
+      }
+      return true
+    },
+    onUploadFileChange(file, fileList) {
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png']
+      const raw = file.raw || file
+      if (!allowedTypes.includes(raw.type)) {
+        this.$message.error('只能上传 pdf/jpg/png 格式的文件')
+        this.$refs.uploadRef.handleRemove(file)
+        return
+      }
+      if (raw.size / 1024 / 1024 >= 10) {
+        this.$message.error(`文件 ${file.name} 超过 10MB，已移除`)
+        this.$refs.uploadRef.handleRemove(file)
+        return
+      }
+      this.uploadFileList = fileList
+    },
+    onUploadFileRemove(file, fileList) {
+      this.uploadFileList = fileList
+    },
+    /** 上传单个文件到 OSS，返回 { ossKey, fileName, fileSize, mimeType } */
+    async uploadFileToOss(file) {
+      const signRes = await getOssSignature()
+      const ossData = signRes.data
+      const suffix = file.name.substring(file.name.lastIndexOf('.'))
+      const ossKey = ossData.dir + '/' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) + suffix
+      const formData = new FormData()
+      formData.append('OSSAccessKeyId', ossData.accessid)
+      formData.append('policy', ossData.policy)
+      formData.append('signature', ossData.signature)
+      formData.append('key', ossKey)
+      formData.append('success_action_status', '200')
+      formData.append('file', file)
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', ossData.host, true)
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolve()
+          } else {
+            reject(new Error('OSS 上传失败，状态码：' + xhr.status))
+          }
+        }
+        xhr.onerror = () => reject(new Error('OSS 上传网络异常'))
+        xhr.send(formData)
+      })
+      return {
+        ossKey,
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type || 'application/octet-stream'
+      }
+    },
+    async handleUpload() {
+      if (!this.uploadFileList.length || !this.uploadProduct) return
+      this.uploading = true
+      try {
+        const attachments = []
+        for (let i = 0; i < this.uploadFileList.length; i++) {
+          const raw = this.uploadFileList[i].raw || this.uploadFileList[i]
+          const info = await this.uploadFileToOss(raw)
+          attachments.push({
+            fileName: info.fileName,
+            fileSize: info.fileSize,
+            mimeType: info.mimeType,
+            ossKey: info.ossKey,
+            productId: this.uploadProduct.id,
+            sortOrder: i
+          })
+        }
+        await saveProductAttachments({ attachments })
+        this.$message.success('图纸上传成功')
+        this.uploadDialogVisible = false
+      } catch (err) {
+        console.log(err)
+        this.$message.error(err.message || '上传失败，请重试')
+      } finally {
+        this.uploading = false
+      }
+    },
     detail(row) {
       this.$router.push({ name: 'ProductDetail', params: { id: row.id }})
     },
@@ -357,5 +525,11 @@ export default {
 <style lang="scss" scoped>
 .hidden-import-input {
   display: none;
+}
+
+.upload-product-info {
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #606266;
 }
 </style>
