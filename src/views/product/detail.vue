@@ -23,6 +23,7 @@
     <!-- 图纸信息 -->
     <div class="mt-4 mb-4 flex items-center justify-between">
       <span style="font-size: 16px;font-weight: bold;">图纸信息</span>
+      <el-button icon="el-icon-upload2" type="primary" @click="openUploadDrawing">上传图纸</el-button>
     </div>
     <el-table v-loading="attachmentLoading" :data="attachmentList" border stripe>
       <el-table-column label="文件名称" prop="fileName" min-width="200" show-overflow-tooltip />
@@ -67,6 +68,7 @@
     </el-table>
 
     <relation-dialog ref="relationDialogRef" @success="getRelationList" />
+    <upload-drawing ref="uploadDrawingRef" @success="getAttachmentList" />
   </div>
 </template>
 
@@ -80,11 +82,13 @@ import {
   deleteProductAttachment
 } from '@/api/product'
 import RelationDialog from './relation-dialog'
+import UploadDrawing from './upload-drawing'
 
 export default {
   name: 'ProductDetail',
   components: {
-    RelationDialog
+    RelationDialog,
+    UploadDrawing
   },
   data() {
     return {
@@ -184,6 +188,9 @@ export default {
     },
     addRelation() {
       this.$refs.relationDialogRef.openAdd(this.ins.id)
+    },
+    openUploadDrawing() {
+      this.$refs.uploadDrawingRef.open(this.ins)
     },
     edit(row) {
       this.$refs.relationDialogRef.openEdit(row, this.ins.id)
