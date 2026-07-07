@@ -247,15 +247,40 @@ export const asyncRoutes = [
     ]
   },
 
-  // {
-  //   path: '/system',
-  //   component: Layout,
-  //   // redirect: '/system/staff',
-  //   name: 'System',
-  //   meta: { title: '系统管理', icon: 'el-icon-s-tools', roles: ['Admin', 'Boss', 'Clerk'] },
-  //   redirect: 'noRedirect',
-  //   children: []
-  // },
+  {
+    path: '/system',
+    component: Layout,
+    name: 'System',
+    meta: { title: '系统设置', icon: 'el-icon-s-tools', roles: ['Admin'] },
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: 'accessLog',
+        name: 'AccessLog',
+        component: () => import('@/views/system/index'),
+        redirect: '/system/accessLog/list',
+        children: [
+          {
+            path: 'list',
+            name: 'AccessLogList',
+            component: () => import('@/views/system/accessLog/list'),
+            meta: { title: '操作日志', icon: 'el-icon-document', roles: ['Admin'] }
+          },
+          {
+            path: 'detail',
+            name: 'AccessLogDetail',
+            component: () => import('@/views/system/accessLog/detail'),
+            hidden: true,
+            meta: {
+              title: '日志详情',
+              activeMenu: '/system/accessLog/list',
+              roles: ['Admin']
+            }
+          }
+        ]
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

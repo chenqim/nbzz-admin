@@ -1,7 +1,9 @@
 <template>
   <section class="app-main">
     <transition name="fade-transform" mode="out-in">
-      <router-view :key="key" />
+      <keep-alive :include="cachedViews">
+        <router-view :key="key" />
+      </keep-alive>
     </transition>
   </section>
 </template>
@@ -9,10 +11,18 @@
 <script>
 export default {
   name: 'AppMain',
+  data() {
+    return {
+      cachedViews: []
+    }
+  },
   computed: {
     key() {
+      // 缓存的视图使用完整路径，确保 keep-alive 能正确识别组件切换
+      if (this.$route.name && this.cachedViews.includes(this.$route.name)) {
+        return this.$route.path
+      }
       const { matched } = this.$route
-      // 嵌套路由用父级 path 作为 key，避免列表↔详情切换时销毁中间层 router-view
       if (matched.length > 2) {
         return matched[matched.length - 2].path
       }

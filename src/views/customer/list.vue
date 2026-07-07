@@ -108,10 +108,7 @@
         <el-pagination
           background
           :current-page="pageConfig.page"
-          :page-size="pageConfig.size"
-          layout="total, sizes, prev, pager, next, jumper"
           :total="pageConfig.total"
-          :page-sizes="[10, 20, 50, 100]"
           @size-change="sizeChange"
           @current-change="pageChange"
         />
