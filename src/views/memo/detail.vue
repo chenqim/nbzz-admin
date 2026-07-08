@@ -43,13 +43,13 @@ export default {
       return ''
     }
   },
-  created() {
-    this.getDetail()
-  },
   watch: {
     '$route.params.id'() {
       this.getDetail()
     }
+  },
+  created() {
+    this.getDetail()
   },
   methods: {
     async getDetail() {

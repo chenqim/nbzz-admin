@@ -251,7 +251,7 @@ export const asyncRoutes = [
     path: '/tools',
     component: Layout,
     name: 'Tools',
-    meta: { title: '工具管理', icon: 'el-icon-s-tools', roles: ['Admin'] },
+    meta: { title: '工具管理', icon: 'el-icon-set-up', roles: ['Admin'] },
     redirect: 'noRedirect',
     alwaysShow: true,
     children: [
@@ -265,7 +265,7 @@ export const asyncRoutes = [
             path: 'list',
             name: 'MemoListPage',
             component: () => import('@/views/memo/list'),
-            meta: { title: '备忘列表', roles: ['Admin'] }
+            meta: { title: '备忘列表', icon: 'el-icon-notebook-2', roles: ['Admin'] }
           },
           {
             path: 'detail/:id',
