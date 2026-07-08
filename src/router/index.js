@@ -248,23 +248,24 @@ export const asyncRoutes = [
   },
 
   {
-    path: '/memo',
+    path: '/tools',
     component: Layout,
-    name: 'Memo',
-    meta: { title: '备忘录', icon: 'el-icon-notebook-2', roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales', 'Drafter'] },
-    redirect: '/memo/list',
+    name: 'Tools',
+    meta: { title: '工具管理', icon: 'el-icon-s-tools', roles: ['Admin'] },
+    redirect: 'noRedirect',
+    alwaysShow: true,
     children: [
       {
-        path: 'list',
-        name: 'MemoList',
+        path: 'memo',
+        name: 'Memo',
         component: () => import('@/views/memo/index'),
-        redirect: '/memo/list',
+        redirect: '/tools/memo/list',
         children: [
           {
-            path: '',
+            path: 'list',
             name: 'MemoListPage',
             component: () => import('@/views/memo/list'),
-            meta: { title: '备忘列表', icon: 'el-icon-notebook-2', roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales', 'Drafter'] }
+            meta: { title: '备忘列表', roles: ['Admin'] }
           },
           {
             path: 'detail/:id',
@@ -273,8 +274,8 @@ export const asyncRoutes = [
             hidden: true,
             meta: {
               title: '备忘详情',
-              activeMenu: '/memo/list',
-              roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales', 'Drafter']
+              activeMenu: '/tools/memo/list',
+              roles: ['Admin']
             }
           }
         ]
@@ -286,7 +287,7 @@ export const asyncRoutes = [
     path: '/system',
     component: Layout,
     name: 'System',
-    meta: { title: '系统设置', icon: 'el-icon-s-tools', roles: ['Admin'] },
+    meta: { title: '系统管理', icon: 'el-icon-s-tools', roles: ['Admin'] },
     redirect: 'noRedirect',
     children: [
       {

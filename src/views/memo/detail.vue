@@ -9,11 +9,11 @@
       <el-descriptions-item label="内部备注" :span="2">{{ ins.remark || '-' }}</el-descriptions-item>
       <el-descriptions-item label="到期日期">
         <span v-if="ins.expireDate" :class="expireClass">{{ ins.expireDate }}</span>
-        <span v-else class="text-gray">无期限（纯记录）</span>
+        <span v-else class="text-gray">无期限</span>
       </el-descriptions-item>
       <el-descriptions-item label="状态">
-        <el-tag :type="ins.status === 'COMPLETED' ? 'success' : 'warning'">
-          {{ ins.status === 'COMPLETED' ? '已完成 / 已处理' : '正常 / 待提醒' }}
+        <el-tag :type="ins.status === 'COMPLETED' ? 'info' : 'success'">
+          {{ ins.status === 'COMPLETED' ? '已完成' : '正常' }}
         </el-tag>
       </el-descriptions-item>
       <el-descriptions-item label="创建时间">{{ ins.createTime }}</el-descriptions-item>
@@ -38,13 +38,18 @@ export default {
     expireClass() {
       if (!this.ins.expireDate || this.ins.status === 'COMPLETED') return ''
       const diff = dayjs(this.ins.expireDate).diff(dayjs(), 'day')
-      if (diff < 0) return 'expire-text expired'
-      if (diff <= 3) return 'expire-text expiring'
+      if (diff <= 0) return 'expire-text expired'
+      if (diff < 7) return 'expire-text expiring'
       return ''
     }
   },
   created() {
     this.getDetail()
+  },
+  watch: {
+    '$route.params.id'() {
+      this.getDetail()
+    }
   },
   methods: {
     async getDetail() {
@@ -59,7 +64,7 @@ export default {
       }
     },
     goBack() {
-      this.$router.push({ name: 'MemoList' })
+      this.$router.push({ name: 'MemoListPage' })
     }
   }
 }

@@ -58,9 +58,9 @@
         <el-table-column label="类名" prop="className" min-width="180" show-overflow-tooltip />
         <el-table-column label="方法名" prop="functionName" min-width="180" show-overflow-tooltip />
         <el-table-column label="主机名" prop="hostName" min-width="120" show-overflow-tooltip />
-        <el-table-column label="请求参数" prop="paramData" min-width="150" show-overflow-tooltip />
-        <el-table-column label="返回数据" prop="returnData" min-width="150" show-overflow-tooltip />
-        <el-table-column label="操作时间" prop="operateDate" min-width="170" />
+        <el-table-column label="请求参数" prop="paramData" min-width="120" show-overflow-tooltip />
+        <el-table-column label="返回数据" prop="returnData" min-width="120" show-overflow-tooltip />
+        <el-table-column label="操作时间" prop="operateDate" min-width="190" />
         <!-- <el-table-column label="操作信息" prop="msg" min-width="100" show-overflow-tooltip /> -->
         <el-table-column label="操作" width="100" fixed="right">
           <template v-slot="{ row }">

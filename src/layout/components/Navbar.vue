@@ -12,7 +12,7 @@
       <el-popover
         placement="bottom"
         width="360"
-        trigger="click"
+        trigger="hover"
         class="reminder-popover"
       >
         <div class="reminder-panel">
@@ -36,13 +36,13 @@
               <div class="reminder-item__title">{{ item.title }}</div>
               <div class="reminder-item__date">
                 <span :class="expireClass(item)">{{ item.expireDate }}</span>
-                <span v-if="expireDaysText(item)" class="reminder-item__days">{{ expireDaysText(item) }}</span>
+                <span v-if="expireDaysText(item)" class="reminder-item__days" :class="{ 'reminder-item__days--expired': expireClass(item) === 'expired' }">{{ expireDaysText(item) }}</span>
               </div>
             </div>
           </div>
         </div>
-        <el-badge slot="reference" :value="reminderList.length" :hidden="reminderList.length === 0" :max="99" class="reminder-badge">
-          <i class="el-icon-bell reminder-bell" @click="fetchReminders" />
+        <el-badge slot="reference" :value="reminderList.length" :hidden="reminderList.length === 0" :max="99" class="reminder-badge" @mouseenter.native="fetchReminders">
+          <i class="el-icon-bell reminder-bell" />
         </el-badge>
       </el-popover>
 
@@ -142,8 +142,8 @@ export default {
     expireClass(item) {
       if (!item.expireDate) return ''
       const diff = dayjs(item.expireDate).diff(dayjs(), 'day')
-      if (diff < 0) return 'expired'
-      if (diff <= 3) return 'expiring'
+      if (diff <= 0) return 'expired'
+      if (diff > 0) return 'expiring'
       return ''
     },
     expireDaysText(item) {
@@ -151,7 +151,7 @@ export default {
       const diff = dayjs(item.expireDate).diff(dayjs(), 'day')
       if (diff < 0) return `已过期${Math.abs(diff)}天`
       if (diff === 0) return '今天到期'
-      if (diff <= 3) return `${diff}天后到期`
+      if (diff > 0) return `${diff}天后到期`
       return ''
     },
     goMemoList() {
@@ -354,6 +354,11 @@ export default {
   &__days {
     font-size: 12px;
     color: #E6A23C;
+    font-weight: 600;
+
+    &--expired {
+      color: #F56C6C;
+    }
   }
 }
 </style>

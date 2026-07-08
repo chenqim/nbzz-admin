@@ -40,6 +40,14 @@ export function toggleMemoComplete(data) {
   })
 }
 
+export function deleteMemo(data) {
+  return request({
+    url: '/taskMemo/deleteByIds',
+    method: 'post',
+    data
+  })
+}
+
 export function getMemoReminderList() {
   return request({
     url: '/taskMemo/queryReminderList',

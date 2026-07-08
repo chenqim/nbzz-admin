@@ -7,14 +7,14 @@
   >
     <el-form ref="model" :model="model" :rules="rules" label-width="100px">
       <el-form-item label="备忘标题" prop="title">
-        <el-input v-model="model.title" placeholder="例如：XX商标注册证、阿里云后台账号" />
+        <el-input v-model="model.title" placeholder="例如：商标注册证、阿里云后台账号" />
       </el-form-item>
       <el-form-item label="详细内容" prop="content">
         <el-input
           v-model="model.content"
           type="textarea"
           :rows="5"
-          placeholder="存放账号、密码、备注等长文本"
+          placeholder="存放网站地址、账号、密码、备注等长文本"
         />
       </el-form-item>
       <el-form-item label="到期日期" prop="expireDate">
@@ -24,11 +24,11 @@
           placeholder="不填则无期限（纯记录）"
           value-format="yyyy-MM-dd"
           clearable
-          class="w-full"
+          style="width: 100%"
         />
       </el-form-item>
-      <el-form-item label="内部备注" prop="remark">
-        <el-input v-model="model.remark" placeholder="可选" />
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="model.remark" type="textarea" placeholder="选填" />
       </el-form-item>
     </el-form>
     <template #footer>

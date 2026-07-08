@@ -6,21 +6,21 @@
         <el-form-item label="备忘标题">
           <el-input
             v-model="queryForm.title"
-            placeholder="请输入备忘标题模糊搜索"
+            placeholder="请输入备忘标题进行模糊查询"
             class="w-64"
             clearable
           />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryForm.status" placeholder="请选择状态" clearable>
-            <el-option value="NORMAL" label="正常 / 待提醒" />
-            <el-option value="COMPLETED" label="已完成 / 已处理" />
+            <el-option value="NORMAL" label="正常" />
+            <el-option value="COMPLETED" label="已完成" />
           </el-select>
         </el-form-item>
         <el-form-item label="到期日期">
-          <el-select v-model="queryForm.hasExpireDate" placeholder="是否有到期日期" clearable>
-            <el-option :value="true" label="有到期日（参与提醒）" />
-            <el-option :value="false" label="无到期日（纯记录）" />
+          <el-select v-model="queryForm.hasExpireDate" placeholder="请选择是否有到期日期" clearable>
+            <el-option :value="true" label="有到期日" />
+            <el-option :value="false" label="无到期日" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -37,7 +37,7 @@
             <span>{{ row.content || '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="内部备注" prop="remark" min-width="150" show-overflow-tooltip>
+        <el-table-column label="备注" prop="remark" min-width="150" show-overflow-tooltip>
           <template v-slot="{ row }">
             <span>{{ row.remark || '-' }}</span>
           </template>
@@ -50,20 +50,21 @@
         </el-table-column>
         <el-table-column label="状态" min-width="120">
           <template v-slot="{ row }">
-            <el-tag :type="row.status === 'COMPLETED' ? 'success' : 'warning'">
+            <el-tag :type="row.status === 'COMPLETED' ? 'info' : 'success'">
               {{ row.status === 'COMPLETED' ? '已完成' : '正常' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" prop="createTime" min-width="160" />
         <el-table-column label="更新时间" prop="updateTime" min-width="160" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="260" fixed="right">
           <template v-slot="{ row }">
             <el-button type="text" @click="detail(row)">详情</el-button>
             <el-button type="text" @click="edit(row)">编辑</el-button>
             <el-button type="text" @click="toggleComplete(row)">
               {{ row.status === 'COMPLETED' ? '取消完成' : '标记完成' }}
             </el-button>
+            <el-button type="text" @click="del(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -82,7 +83,7 @@
 </template>
 
 <script>
-import { getMemoPage, toggleMemoComplete } from '@/api/memo'
+import { getMemoPage, toggleMemoComplete, deleteMemo } from '@/api/memo'
 import dayjs from 'dayjs'
 import Create from './create'
 
@@ -167,11 +168,21 @@ export default {
         console.log(error)
       }
     },
+    async del(row) {
+      try {
+        await this.$confirm('确定删除该备忘吗？删除后不可恢复。', '系统提示', { type: 'warning' })
+        await deleteMemo({ ids: [row.id] })
+        this.$message.success('删除成功')
+        this.getList()
+      } catch (error) {
+        console.log(error)
+      }
+    },
     expireClass(row) {
       if (!row.expireDate || row.status === 'COMPLETED') return ''
       const diff = dayjs(row.expireDate).diff(dayjs(), 'day')
-      if (diff < 0) return 'expire-text expired'
-      if (diff <= 3) return 'expire-text expiring'
+      if (diff <= 0) return 'expire-text expired'
+      if (diff < 7) return 'expire-text expiring'
       return ''
     },
     sizeChange(v) {
