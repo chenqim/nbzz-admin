@@ -248,6 +248,41 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/memo',
+    component: Layout,
+    name: 'Memo',
+    meta: { title: '备忘录', icon: 'el-icon-notebook-2', roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales', 'Drafter'] },
+    redirect: '/memo/list',
+    children: [
+      {
+        path: 'list',
+        name: 'MemoList',
+        component: () => import('@/views/memo/index'),
+        redirect: '/memo/list',
+        children: [
+          {
+            path: '',
+            name: 'MemoListPage',
+            component: () => import('@/views/memo/list'),
+            meta: { title: '备忘列表', icon: 'el-icon-notebook-2', roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales', 'Drafter'] }
+          },
+          {
+            path: 'detail/:id',
+            name: 'MemoDetail',
+            component: () => import('@/views/memo/detail'),
+            hidden: true,
+            meta: {
+              title: '备忘详情',
+              activeMenu: '/memo/list',
+              roles: ['Admin', 'Boss', 'Leader', 'Clerk', 'Sales', 'Drafter']
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  {
     path: '/system',
     component: Layout,
     name: 'System',
