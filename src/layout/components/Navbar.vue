@@ -10,6 +10,7 @@
         <span v-if="roleText" class="user-role">{{ roleText }}</span>
       </div>
       <el-popover
+        v-if="isAdmin"
         placement="bottom"
         width="360"
         trigger="hover"
@@ -63,12 +64,69 @@
           <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
             <el-dropdown-item>Docs</el-dropdown-item>
           </a> -->
+          <el-dropdown-item divided @click.native="showChangePwd">
+            <span style="display:block;">修改密码</span>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">登出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+
+    <!-- 修改密码弹窗 -->
+    <el-dialog
+      title="修改密码"
+      :visible.sync="pwdDialogVisible"
+      width="420px"
+      :close-on-click-modal="false"
+      @closed="resetPwdForm"
+    >
+      <el-form
+        ref="pwdForm"
+        :model="pwdForm"
+        :rules="pwdRules"
+        label-width="90px"
+        label-position="left"
+      >
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input
+            v-model="pwdForm.oldPassword"
+            type="password"
+            show-password
+            placeholder="请输入旧密码"
+            autocomplete="current-password"
+          />
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword" class="pwd-form-item--has-strength">
+          <el-input
+            v-model="pwdForm.newPassword"
+            type="password"
+            show-password
+            placeholder="请输入新密码"
+            autocomplete="new-password"
+          />
+          <div class="pwd-strength">
+            <span class="pwd-strength__label">密码强度：</span>
+            <span :class="['pwd-strength__bar', strengthClass]" />
+            <span :class="['pwd-strength__text', strengthClass]">{{ strengthText }}</span>
+          </div>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input
+            v-model="pwdForm.confirmPassword"
+            type="password"
+            show-password
+            placeholder="请再次输入新密码"
+            autocomplete="new-password"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="pwdDialogVisible = false">取 消</el-button>
+        <el-button type="primary" :loading="pwdLoading" @click="submitChangePwd">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -77,6 +135,7 @@ import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import { getMemoReminderList } from '@/api/memo'
+import { updatePwd } from '@/api/user'
 import dayjs from 'dayjs'
 // import store from '../index'
 
@@ -90,10 +149,65 @@ export default {
       defaultAvatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80',
       reminderList: [],
       reminderLoading: false,
-      reminderTimer: null
+      reminderTimer: null,
+      pwdDialogVisible: false,
+      pwdLoading: false,
+      pwdForm: {
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }
     }
   },
   computed: {
+    pwdRules() {
+      const validatePwd = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入密码'))
+          return
+        }
+        const count = this.getPasswordTypeCount(value)
+        if (count < 3) {
+          callback(new Error('密码必须包含大写字母、小写字母、数字、特殊字符中的至少三种'))
+          return
+        }
+        callback()
+      }
+      const validateConfirm = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请再次输入密码'))
+          return
+        }
+        if (value !== this.pwdForm.newPassword) {
+          callback(new Error('两次输入的密码不一致'))
+          return
+        }
+        callback()
+      }
+      return {
+        oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
+        newPassword: [{ required: true, validator: validatePwd, trigger: 'blur' }],
+        confirmPassword: [{ required: true, validator: validateConfirm, trigger: 'blur' }]
+      }
+    },
+    passwordStrength() {
+      return this.getPasswordTypeCount(this.pwdForm.newPassword)
+    },
+    strengthClass() {
+      const s = this.passwordStrength
+      if (s <= 1) return 'weak'
+      if (s === 2) return 'medium'
+      if (s === 3) return 'strong'
+      return 'very-strong'
+    },
+    strengthText() {
+      const s = this.passwordStrength
+      if (!this.pwdForm.newPassword) return ''
+      if (s <= 1) return '弱'
+      if (s === 2) return '中'
+      if (s === 3) return '强'
+      return '很强'
+    },
     ...mapGetters([
       'sidebar',
       'avatar',
@@ -101,6 +215,9 @@ export default {
       'roles',
       'roleNames'
     ]),
+    isAdmin() {
+      return (this.roles || []).includes('admin')
+    },
     roleText() {
       const names = (this.roleNames || []).filter(Boolean)
       if (names.length) {
@@ -110,10 +227,12 @@ export default {
     }
   },
   mounted() {
-    this.fetchReminders()
-    this.reminderTimer = setInterval(() => {
+    if (this.isAdmin) {
       this.fetchReminders()
-    }, 5 * 60 * 1000)
+      this.reminderTimer = setInterval(() => {
+        this.fetchReminders()
+      }, 5 * 60 * 1000)
+    }
   },
   beforeDestroy() {
     if (this.reminderTimer) {
@@ -159,6 +278,39 @@ export default {
     },
     goMemoDetail(item) {
       this.$router.push({ name: 'MemoDetail', params: { id: item.id }})
+    },
+    showChangePwd() {
+      this.pwdDialogVisible = true
+    },
+    resetPwdForm() {
+      this.pwdForm = { oldPassword: '', newPassword: '', confirmPassword: '' }
+      this.$refs.pwdForm && this.$refs.pwdForm.resetFields()
+    },
+    getPasswordTypeCount(pwd) {
+      if (!pwd) return 0
+      let count = 0
+      if (/[a-z]/.test(pwd)) count++
+      if (/[A-Z]/.test(pwd)) count++
+      if (/\d/.test(pwd)) count++
+      if (/[^a-zA-Z0-9]/.test(pwd)) count++
+      return count
+    },
+    submitChangePwd() {
+      this.$refs.pwdForm.validate(async(valid) => {
+        if (!valid) return
+        this.pwdLoading = true
+        try {
+          await updatePwd({ oldPassword: this.pwdForm.oldPassword, newPassword: this.pwdForm.newPassword })
+          this.$message.success('密码修改成功，请重新登录')
+          this.pwdDialogVisible = false
+          await this.$store.dispatch('user/logout')
+          this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+        } catch (e) {
+          console.log(e)
+        } finally {
+          this.pwdLoading = false
+        }
+      })
     }
   }
 }
@@ -279,9 +431,47 @@ export default {
     }
   }
 }
+.pwd-strength {
+  display: flex;
+  align-items: center;
+  margin-top: 6px;
+  margin-bottom: 2px;
+  font-size: 12px;
+  line-height: 1;
+
+  &__label {
+    color: #909399;
+  }
+
+  &__bar {
+    display: inline-block;
+    width: 60px;
+    height: 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    background: #dcdfe6;
+    transition: background 0.3s;
+
+    &.weak { background: #F56C6C; }
+    &.medium { background: #E6A23C; }
+    &.strong { background: #409EFF; }
+    &.very-strong { background: #67C23A; }
+  }
+
+  &__text {
+    &.weak { color: #F56C6C; }
+    &.medium { color: #E6A23C; }
+    &.strong { color: #409EFF; }
+    &.very-strong { color: #67C23A; }
+  }
+}
 </style>
 
 <style lang="scss">
+.pwd-form-item--has-strength {
+  margin-bottom: 36px !important;
+}
+
 .reminder-panel {
   max-height: 360px;
   overflow-y: auto;
