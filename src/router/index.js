@@ -153,6 +153,41 @@ export const asyncRoutes = [
             }
           }
         ]
+      },
+      {
+        path: 'quotation',
+        name: 'Quotation',
+        component: () => import('@/views/quotation/index'),
+        redirect: '/client/quotation/list',
+        children: [
+          {
+            path: 'list',
+            name: 'QuotationList',
+            component: () => import('@/views/quotation/list'),
+            meta: { title: '报价管理', icon: 'el-icon-document', roles: ['Admin', 'Boss', 'Clerk', 'Sales'] }
+          },
+          {
+            path: 'create',
+            name: 'QuotationCreate',
+            component: () => import('@/views/quotation/create'),
+            hidden: true,
+            meta: { title: '创建报价单', activeMenu: '/client/quotation/list', roles: ['Admin', 'Boss', 'Clerk', 'Sales'] }
+          },
+          {
+            path: 'edit/:id',
+            name: 'QuotationEdit',
+            component: () => import('@/views/quotation/create'),
+            hidden: true,
+            meta: { title: '编辑报价单', activeMenu: '/client/quotation/list', roles: ['Admin', 'Boss', 'Clerk', 'Sales'] }
+          },
+          {
+            path: 'detail/:id',
+            name: 'QuotationDetail',
+            component: () => import('@/views/quotation/detail'),
+            hidden: true,
+            meta: { title: '报价单详情', activeMenu: '/client/quotation/list', roles: ['Admin', 'Boss', 'Clerk', 'Sales'] }
+          }
+        ]
       }
     ]
   },
